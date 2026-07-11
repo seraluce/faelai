@@ -1,0 +1,114 @@
+---
+// src/pages/en/admin/users/index.astro
+// 功能：用户管理页面（英文） — 用户列表、角色修改、封禁/解封
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout>
+  <div class="px-4 py-8 md:px-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('admin.users')}</h1>
+      <p class="mt-1 text-text-secondary">Manage registered users</p>
+    </div>
+
+    <div class="rounded-xl border border-border bg-card">
+      <div id="user-list" class="divide-y divide-border">
+        <div class="p-8 text-center text-text-tertiary">Loading...</div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  async function loadUsers() {
+    try {
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      const list = getEl('user-list');
+
+      if (!data.users || data.users.length === 0) {
+        list.innerHTML = `<div class="p-8 text-center text-text-tertiary">No users yet</div>`;
+        return;
+      }
+
+      list.innerHTML = data.users
+        .map((u: any) => {
+          const date = new Date(u.createdAt).toLocaleDateString('en-US');
+          return `
+          <div class="flex items-center gap-4 px-4 py-3 hover:bg-background-hover">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-sm font-bold text-accent">
+              ${(u.fullName || u.username)[0].toUpperCase()}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-text-primary">${u.fullName || u.username}</span>
+                <span class="text-xs text-text-tertiary">@${u.username}</span>
+                ${u.isBlocked ? '<span class="rounded-full bg-error/10 px-2 py-0.5 text-xs text-error">Blocked</span>' : ''}
+              </div>
+              <p class="text-xs text-text-tertiary">${u.email} - ${date}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select data-user-id="${u.id}" class="role-select rounded border border-border bg-background px-2 py-1 text-xs text-text-primary focus:border-accent focus:outline-none">
+                <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
+                <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>Editor</option>
+                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+              </select>
+              <button data-user-id="${u.id}" data-blocked="${!u.isBlocked}" class="block-btn rounded p-1 text-text-tertiary transition-colors hover:bg-background-hover ${u.isBlocked ? 'hover:text-success' : 'hover:text-error'}" title="${u.isBlocked ? 'Unblock' : 'Block'}">
+                ${
+                  u.isBlocked
+                    ? '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+                    : '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>'
+                }
+              </button>
+            </div>
+          </div>
+        `;
+        })
+        .join('');
+
+      list.querySelectorAll('.role-select').forEach((sel) => {
+        sel.addEventListener('change', async () => {
+          const userId = (sel as HTMLElement).dataset.userId;
+          const role = (sel as HTMLSelectElement).value;
+          await fetch('/api/users', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: userId, role }),
+          });
+        });
+      });
+
+      list.querySelectorAll('.block-btn').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const userId = (btn as HTMLElement).dataset.userId;
+          const blocked = (btn as HTMLElement).dataset.blocked === 'true';
+          const action = blocked ? 'block' : 'unblock';
+          if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+          await fetch('/api/users', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: userId, isBlocked: blocked }),
+          });
+          loadUsers();
+        });
+      });
+    } catch {
+      getEl('user-list').innerHTML = `<div class="p-8 text-center text-error">Failed to load</div>`;
+    }
+  }
+
+  loadUsers();
+</script>

@@ -75,6 +75,7 @@ const categoryIcons: Record<string, string> = {
       {/* Categories Dropdown */}
       <div class="relative header-dropdown">
         <button
+          data-dropdown
           class="flex items-center gap-1 px-3 py-1.5 text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
         >
           {t('nav.categories')}
@@ -84,7 +85,8 @@ const categoryIcons: Record<string, string> = {
           </svg>
         </button>
         <div
-          class="dropdown-menu invisible absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 rounded-xl border border-border bg-background p-1.5 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100"
+          data-dropdown-menu
+          class="dropdown-menu hidden absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 rounded-xl border border-border bg-background p-1.5 transition-all duration-200"
           style="box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 4px 8px -4px rgba(0,0,0,0.04), 0 16px 24px -8px rgba(0,0,0,0.06);"
         >
           {
@@ -110,6 +112,7 @@ const categoryIcons: Record<string, string> = {
       {/* Topics Dropdown */}
       <div class="relative header-dropdown">
         <button
+          data-dropdown
           class="flex items-center gap-1 px-3 py-1.5 text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
         >
           {t('nav.topics')}
@@ -119,7 +122,8 @@ const categoryIcons: Record<string, string> = {
           </svg>
         </button>
         <div
-          class="dropdown-menu invisible absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-background p-1.5 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100"
+          data-dropdown-menu
+          class="dropdown-menu hidden absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-background p-1.5 transition-all duration-200"
           style="box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 4px 8px -4px rgba(0,0,0,0.04), 0 16px 24px -8px rgba(0,0,0,0.06);"
         >
           {
@@ -297,11 +301,6 @@ const categoryIcons: Record<string, string> = {
 </header>
 
 <style>
-  .header-dropdown:hover .dropdown-menu {
-    visibility: visible;
-    opacity: 1;
-  }
-
   .icon-btn:focus-visible,
   .nav-link:focus-visible,
   .btn-primary:focus-visible,
@@ -323,6 +322,43 @@ const categoryIcons: Record<string, string> = {
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
+    // Desktop dropdown toggles
+    document.querySelectorAll('[data-dropdown]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const menu = btn.closest('.header-dropdown')?.querySelector('[data-dropdown-menu]');
+        if (!menu) return;
+        const isOpen = !menu.classList.contains('hidden');
+        // Close all other open dropdowns first
+        document.querySelectorAll('[data-dropdown-menu]').forEach((m) => {
+          if (m !== menu) m.classList.add('hidden');
+        });
+        menu.classList.toggle('hidden', isOpen);
+      });
+    });
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', () => {
+      document.querySelectorAll('[data-dropdown-menu]').forEach((m) => {
+        m.classList.add('hidden');
+      });
+    });
+
+    // Close dropdowns on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('[data-dropdown-menu]').forEach((m) => {
+          m.classList.add('hidden');
+        });
+      }
+    });
+
+    // Prevent dropdown menu clicks from closing
+    document.querySelectorAll('[data-dropdown-menu]').forEach((menu) => {
+      menu.addEventListener('click', (e) => e.stopPropagation());
+    });
+
+    // Mobile menu toggle
     const toggle = document.getElementById('mobile-menu-toggle');
     const menu = document.getElementById('mobile-menu');
     toggle?.addEventListener('click', () => menu?.classList.toggle('hidden'));

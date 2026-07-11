@@ -1,11 +1,10 @@
 ---
 // src/components/layout/Footer.astro
-// 功能：网站底部 — 品牌介绍、社交链接、产品/分类/话题导航、协议链接、版权信息
-import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+// 功能：网站底部 — 紧凑单行底栏：版权信息、协议链接、社交图标
+import { getLangFromUrl, getLocalizedPath } from '@/i18n/utils';
 import { siteConfig } from '@/config/site';
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 const year = siteConfig.copyright.year;
 
 function getLabel(item: { zh?: string; en?: string }): string {
@@ -13,183 +12,56 @@ function getLabel(item: { zh?: string; en?: string }): string {
 }
 ---
 
-<footer class="border-t border-border bg-background-secondary">
-  {/* Hero / Brand Section */}
-  <div class="border-b border-border">
-    <div class="mx-auto max-w-7xl px-4 py-16 text-center">
-      <a
-        href={getLocalizedPath('/', lang)}
-        class="inline-flex items-center gap-2 text-3xl font-bold tracking-tight"
-      >
-        <span class="text-accent">Fael</span><span class="text-text-primary">AI</span>
-      </a>
-      <p class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-text-secondary">
-        {lang === 'en' ? siteConfig.descriptionEn : siteConfig.description}
-      </p>
-      <div class="mt-6 flex items-center justify-center gap-3">
-        {
-          siteConfig.social.map((link) => (
+<footer class="border-t border-border bg-background">
+  <div
+    class="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-4 md:flex-row md:justify-between"
+  >
+    {/* Left: Copyright + Protocol links */}
+    <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-text-disabled">
+      <span>&copy; {year} {siteConfig.copyright.holder}</span>
+      {
+        siteConfig.protocols.map((proto) => (
+          <>
+            <span class="bottom-separator hidden sm:inline" />
             <a
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="social-btn flex h-9 w-9 items-center justify-center rounded-full border border-border text-text-secondary transition-colors duration-150 hover:border-text-disabled hover:text-text-primary"
-              aria-label={link.label}
+              href={getLocalizedPath(proto.path, lang)}
+              class="footer-link transition-colors duration-150 hover:text-text-secondary"
             >
-              {link.icon === 'github' && (
-                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path
-                    fill-rule="evenodd"
-                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              )}
-              {link.icon === 'twitter' && (
-                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              )}
+              {getLabel(proto)}
             </a>
-          ))
-        }
-      </div>
+          </>
+        ))
+      }
     </div>
-  </div>
 
-  {/* Links Grid */}
-  <div class="mx-auto max-w-7xl px-4 py-12">
-    <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
-      {/* Product */}
-      <div>
-        <h3
-          class="mb-4 text-xs font-semibold uppercase tracking-wider text-text-primary"
-          style="letter-spacing: 0.05em;"
-        >
-          {lang === 'en' ? 'Product' : '\u4ea7\u54c1'}
-        </h3>
-        <ul class="space-y-2.5">
-          {
-            siteConfig.footerProduct.map((link) => (
-              <li>
-                <a
-                  href={getLocalizedPath(link.path, lang)}
-                  class="footer-link text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
-                >
-                  {getLabel(link)}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      {/* Categories */}
-      <div>
-        <h3
-          class="mb-4 text-xs font-semibold uppercase tracking-wider text-text-primary"
-          style="letter-spacing: 0.05em;"
-        >
-          {t('nav.categories')}
-        </h3>
-        <ul class="space-y-2.5">
-          {
-            siteConfig.footerCategories.map((link) => (
-              <li>
-                <a
-                  href={getLocalizedPath(link.path, lang)}
-                  class="footer-link text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
-                >
-                  {getLabel(link)}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      {/* Topics */}
-      <div>
-        <h3
-          class="mb-4 text-xs font-semibold uppercase tracking-wider text-text-primary"
-          style="letter-spacing: 0.05em;"
-        >
-          {t('nav.topics')}
-        </h3>
-        <ul class="space-y-2.5">
-          {
-            siteConfig.footerTopics.map((link) => (
-              <li>
-                <a
-                  href={getLocalizedPath(link.path, lang)}
-                  class="footer-link text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
-                >
-                  {getLabel(link)}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      {/* Contact */}
-      <div>
-        <h3
-          class="mb-4 text-xs font-semibold uppercase tracking-wider text-text-primary"
-          style="letter-spacing: 0.05em;"
-        >
-          {lang === 'en' ? 'Contact' : '\u8054\u7cfb\u6211\u4eec'}
-        </h3>
-        <ul class="space-y-2.5">
-          <li>
-            <a
-              href={`mailto:${siteConfig.email}`}
-              class="footer-link text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
-            >
-              {siteConfig.email}
-            </a>
-          </li>
-          {
-            siteConfig.social.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="footer-link text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  {/* Bottom Bar: Copyright + Protocols */}
-  <div class="border-t border-border">
-    <div
-      class="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-6 md:flex-row md:justify-between"
-    >
-      <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-text-disabled">
-        <span>&copy; {year} {siteConfig.copyright.holder}</span>
-        {
-          siteConfig.protocols.map((proto) => (
-            <>
-              <span class="bottom-separator hidden sm:inline" />
-              <a
-                href={getLocalizedPath(proto.path, lang)}
-                class="footer-link transition-colors duration-150 hover:text-text-secondary"
-              >
-                {getLabel(proto)}
-              </a>
-            </>
-          ))
-        }
-      </div>
-      <p class="text-xs text-text-disabled">{t('footer.powered')}</p>
+    {/* Right: Social icons */}
+    <div class="flex items-center gap-2">
+      {
+        siteConfig.social.map((link) => (
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-btn flex h-8 w-8 items-center justify-center rounded-md text-text-disabled transition-colors duration-150 hover:text-text-primary"
+            aria-label={link.label}
+          >
+            {link.icon === 'github' && (
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  fill-rule="evenodd"
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            )}
+            {link.icon === 'twitter' && (
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            )}
+          </a>
+        ))
+      }
     </div>
   </div>
 </footer>

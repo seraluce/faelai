@@ -137,11 +137,10 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
       {/* Sidebar */}
       <div class="space-y-8">
         {/* Trending */}
-        <div
-          class="rounded-[12px] border border-border bg-card p-6"
-          style="box-shadow: var(--shadow-card)"
-        >
-          <h3 class="mb-5 text-base font-semibold text-text-primary tracking-[-0.02em]">
+        <div class="pb-4">
+          <h3
+            class="mb-3 border-b border-border pb-3 text-base font-semibold text-text-primary tracking-[-0.02em]"
+          >
             {t('home.trending')}
           </h3>
           <ul class="space-y-0">
@@ -174,11 +173,10 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
         </div>
 
         {/* Hot Topics */}
-        <div
-          class="rounded-[12px] border border-border bg-card p-6"
-          style="box-shadow: var(--shadow-card)"
-        >
-          <h3 class="mb-5 text-base font-semibold text-text-primary tracking-[-0.02em]">
+        <div class="pb-4">
+          <h3
+            class="mb-3 border-b border-border pb-3 text-base font-semibold text-text-primary tracking-[-0.02em]"
+          >
             {t('home.hot')}
           </h3>
           <div class="flex flex-wrap gap-2">
@@ -186,7 +184,7 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
               hotTopics.map((topic) => (
                 <a
                   href={getLocalizedPath('/tag/' + topic.slug, lang)}
-                  class="rounded-[6px] border border-border bg-background px-3 py-1.5 text-sm font-medium text-text-secondary transition-all duration-150 hover:border-border-hover hover:text-text-primary"
+                  class="rounded-[6px] px-3 py-1.5 text-sm font-medium text-text-secondary transition-all duration-150 hover:text-text-primary"
                 >
                   {topic.name}
                   <span class="ml-1 text-text-disabled">{topic.count}</span>
@@ -197,11 +195,10 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
         </div>
 
         {/* Newsletter */}
-        <div
-          class="rounded-[12px] border border-border bg-card p-6"
-          style="box-shadow: var(--shadow-card)"
-        >
-          <h3 class="mb-1 text-base font-semibold text-text-primary tracking-[-0.02em]">
+        <div class="pb-4">
+          <h3
+            class="mb-1 border-b border-border pb-3 text-base font-semibold text-text-primary tracking-[-0.02em]"
+          >
             订阅周报
           </h3>
           <p class="mb-4 text-sm text-text-secondary">每周精选 AI 新闻，直达邮箱</p>
@@ -224,15 +221,19 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
   </section>
 
   {/* Categories Section */}
-  <section class="border-t border-border bg-background-secondary py-12">
+  <section class="py-12">
     <div class="mx-auto max-w-7xl px-4">
-      <h2 class="mb-8 text-xl font-semibold text-text-primary tracking-[-0.02em]">探索分类</h2>
+      <h2
+        class="mb-8 border-b border-border pb-4 text-xl font-semibold text-text-primary tracking-[-0.02em]"
+      >
+        探索分类
+      </h2>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
         {
           categories.map((category) => (
             <a
               href={getLocalizedPath('/category/' + category.slug, lang)}
-              class="group flex flex-col items-center rounded-[12px] border border-border bg-card p-6 transition-all duration-150 hover:border-border-hover hover:bg-card-hover"
+              class="group flex flex-col items-center rounded-[12px] px-4 py-4 text-center transition-all duration-150 hover:bg-background-secondary"
             >
               {category.icon && <span class="mb-3 text-3xl" set:html={category.icon} />}
               <span class="text-sm font-medium text-text-primary">

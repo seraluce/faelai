@@ -1,11 +1,10 @@
 // src/pages/api/auth/reset-password.ts
-// 功能：密码重置 API — POST 生成重置令牌、发送重置邮件、开发模式返回令牌
+// 功能：密码重置请求 API — POST 生成重置令牌、发送重置邮件、开发模式返回令牌
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import nodemailer from 'nodemailer';
-
-const resetTokenStore = new Map<string, { token: string; expiresAt: number }>();
+import { storeResetToken } from './confirm-reset';
 
 const transporter = nodemailer.createTransport({
   host: import.meta.env.SMTP_HOST || 'smtp.gmail.com',
@@ -43,8 +42,8 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const token = crypto.randomUUID();
-    const expiresAt = Date.now() + 30 * 60 * 1000;
-    resetTokenStore.set(email, { token, expiresAt });
+    const expiresAt = Date.now() + 60 * 60 * 1000;
+    storeResetToken(token, users[0].id, expiresAt);
 
     if (!import.meta.env.SMTP_USER) {
       console.log(`[DEV] Password reset token for ${email}: ${token}`);
@@ -71,7 +70,7 @@ export const POST: APIRoute = async ({ request }) => {
                style="display: inline-block; padding: 12px 24px; background: #0070f3; color: #fff; text-decoration: none; border-radius: 8px; margin: 16px 0;">
               重置密码
             </a>
-            <p style="color: #666; font-size: 14px;">此链接 30 分钟内有效。如果这不是你本人的操作，请忽略此邮件。</p>
+            <p style="color: #666; font-size: 14px;">此链接 1 小时内有效。如果这不是你本人的操作，请忽略此邮件。</p>
           </div>
         `,
       });

@@ -1,6 +1,6 @@
 ---
-// src/pages/admin/index.astro
-// 功能：管理后台仪表盘（中文） — 系统统计、最近文章、快速操作、系统信息
+// src/pages/en/admin/index.astro
+// 功能：管理后台仪表盘（英文） — 系统统计、最近文章、快速操作、系统信息
 import AdminLayout from '@/layouts/AdminLayout.astro';
 import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 import { db, schema } from '@/lib/db';
@@ -38,10 +38,10 @@ const recentArticles = await db
   .limit(5);
 
 const stats = [
-  { label: '总文章数', value: totalArticles.toLocaleString(), icon: 'document' },
-  { label: '已发布', value: publishedArticles.toLocaleString(), icon: 'chart-bar' },
-  { label: '总用户数', value: totalUsers.toLocaleString(), icon: 'users' },
-  { label: 'RSS 源', value: totalFeeds.toLocaleString(), icon: 'rss' },
+  { label: 'Total Articles', value: totalArticles.toLocaleString(), icon: 'document' },
+  { label: 'Published', value: publishedArticles.toLocaleString(), icon: 'chart-bar' },
+  { label: 'Total Users', value: totalUsers.toLocaleString(), icon: 'users' },
+  { label: 'RSS Feeds', value: totalFeeds.toLocaleString(), icon: 'rss' },
 ];
 
 const statusColors: Record<string, string> = {
@@ -51,9 +51,9 @@ const statusColors: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  published: '已发布',
-  draft: '草稿',
-  archived: '已归档',
+  published: 'Published',
+  draft: 'Draft',
+  archived: 'Archived',
 };
 
 function timeAgo(date: Date | null): string {
@@ -61,12 +61,12 @@ function timeAgo(date: Date | null): string {
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return '刚刚';
-  if (minutes < 60) return `${minutes} 分钟前`;
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} 小时前`;
+  if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
-  return `${days} 天前`;
+  return `${days}d ago`;
 }
 ---
 
@@ -75,10 +75,10 @@ function timeAgo(date: Date | null): string {
     <div class="mb-8 flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-text-primary">{t('admin.title')}</h1>
-        <p class="mt-1 text-text-secondary">欢迎回来，{user.fullName || user.username}</p>
+        <p class="mt-1 text-text-secondary">Welcome back, {user.fullName || user.username}</p>
       </div>
       <a
-        href="/admin/articles/new"
+        href="/en/admin/articles/new"
         class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
       >
         {t('dashboard.newArticle')}
@@ -166,8 +166,8 @@ function timeAgo(date: Date | null): string {
       <div class="lg:col-span-2">
         <div class="rounded-xl border border-border bg-card">
           <div class="flex items-center justify-between border-b border-border p-4">
-            <h2 class="font-semibold text-text-primary">最近文章</h2>
-            <a href="/admin/articles" class="text-sm text-accent hover:underline">查看全部</a>
+            <h2 class="font-semibold text-text-primary">Recent Articles</h2>
+            <a href="/en/admin/articles" class="text-sm text-accent hover:underline">View All</a>
           </div>
           <div class="divide-y divide-border">
             {
@@ -181,7 +181,7 @@ function timeAgo(date: Date | null): string {
                     <div class="flex items-center gap-4">
                       {(article.viewCount ?? 0) > 0 && (
                         <span class="text-xs text-text-tertiary">
-                          {(article.viewCount ?? 0).toLocaleString()} 阅读
+                          {(article.viewCount ?? 0).toLocaleString()} views
                         </span>
                       )}
                       <span
@@ -193,7 +193,7 @@ function timeAgo(date: Date | null): string {
                   </div>
                 ))
               ) : (
-                <div class="p-4 text-sm text-text-tertiary">暂无文章</div>
+                <div class="p-4 text-sm text-text-tertiary">No articles yet</div>
               )
             }
           </div>
@@ -204,10 +204,10 @@ function timeAgo(date: Date | null): string {
       <div class="space-y-6">
         {/* Quick Links */}
         <div class="rounded-xl border border-border bg-card p-6">
-          <h3 class="mb-4 font-semibold text-text-primary">快速操作</h3>
+          <h3 class="mb-4 font-semibold text-text-primary">Quick Actions</h3>
           <div class="space-y-2">
             <a
-              href="/admin/articles"
+              href="/en/admin/articles"
               class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
             >
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -218,10 +218,10 @@ function timeAgo(date: Date | null): string {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 ></path></svg
               >
-              文章管理
+              Articles
             </a>
             <a
-              href="/admin/feeds"
+              href="/en/admin/feeds"
               class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
             >
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -232,10 +232,10 @@ function timeAgo(date: Date | null): string {
                   d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z"
                 ></path></svg
               >
-              RSS 源管理
+              RSS Feeds
             </a>
             <a
-              href="/admin/categories"
+              href="/en/admin/categories"
               class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
             >
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -246,10 +246,10 @@ function timeAgo(date: Date | null): string {
                   d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"
                 ></path></svg
               >
-              分类管理
+              Categories
             </a>
             <a
-              href="/admin/users"
+              href="/en/admin/users"
               class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
             >
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -260,25 +260,25 @@ function timeAgo(date: Date | null): string {
                   d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
                 ></path></svg
               >
-              用户管理
+              Users
             </a>
           </div>
         </div>
 
         {/* System Info */}
         <div class="rounded-xl border border-border bg-card p-6">
-          <h3 class="mb-4 font-semibold text-text-primary">系统信息</h3>
+          <h3 class="mb-4 font-semibold text-text-primary">System Info</h3>
           <div class="space-y-3 text-sm">
             <div class="flex justify-between">
-              <span class="text-text-secondary">版本</span>
+              <span class="text-text-secondary">Version</span>
               <span class="text-text-primary">FaelAI v1.0</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-text-secondary">数据库状态</span>
-              <span class="text-success">正常</span>
+              <span class="text-text-secondary">Database</span>
+              <span class="text-success">Healthy</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-text-secondary">分类数</span>
+              <span class="text-text-secondary">Categories</span>
               <span class="text-text-primary">{totalCategories}</span>
             </div>
           </div>

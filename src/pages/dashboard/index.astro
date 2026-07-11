@@ -3,6 +3,8 @@
 // 功能：用户仪表盘（中文） — 个人资料卡片、数据统计、快捷操作、最近收藏
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+import { db, schema } from '@/lib/db';
+import { and, eq, desc, sql } from 'drizzle-orm';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -10,6 +12,42 @@ const t = useTranslations(lang);
 const user = Astro.locals.user;
 if (!user) {
   return Astro.redirect(getLocalizedPath('/login', lang));
+}
+
+const [{ count: myArticles }] = await db
+  .select({ count: sql<number>`count(*)` })
+  .from(schema.articles)
+  .where(eq(schema.articles.authorId, user.id));
+const [{ count: totalBookmarks }] = await db
+  .select({ count: sql<number>`count(*)` })
+  .from(schema.userBookmarks)
+  .where(eq(schema.userBookmarks.userId, user.id));
+
+const [{ count: myPublished }] = await db
+  .select({ count: sql<number>`count(*)` })
+  .from(schema.articles)
+  .where(and(eq(schema.articles.authorId, user.id), eq(schema.articles.status, 'published')));
+const myDraftCount = myArticles - myPublished;
+
+const recentBookmarks = await db
+  .select({ article: schema.articles, bookmark: schema.userBookmarks })
+  .from(schema.userBookmarks)
+  .innerJoin(schema.articles, eq(schema.userBookmarks.articleId, schema.articles.id))
+  .where(eq(schema.userBookmarks.userId, user.id))
+  .orderBy(desc(schema.userBookmarks.createdAt))
+  .limit(5);
+
+function timeAgo(date: Date | null): string {
+  if (!date) return '';
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes} 分钟前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} 小时前`;
+  const days = Math.floor(hours / 24);
+  return `${days} 天前`;
 }
 ---
 
@@ -45,15 +83,15 @@ if (!user) {
         <div class="space-y-3">
           <div class="flex justify-between">
             <span class="text-sm text-text-secondary">发布文章</span>
-            <span class="text-sm font-medium text-text-primary">3</span>
+            <span class="text-sm font-medium text-text-primary">{myPublished}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-sm text-text-secondary">草稿</span>
-            <span class="text-sm font-medium text-text-primary">2</span>
+            <span class="text-sm font-medium text-text-primary">{myDraftCount}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-sm text-text-secondary">收藏</span>
-            <span class="text-sm font-medium text-text-primary">12</span>
+            <span class="text-sm font-medium text-text-primary">{totalBookmarks}</span>
           </div>
         </div>
       </div>
@@ -133,27 +171,21 @@ if (!user) {
           >
         </div>
         <div class="space-y-3">
-          <a
-            href={getLocalizedPath('/news/ai-agent-automation-workflow', lang)}
-            class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
-          >
-            <span class="text-sm text-text-primary">AI Agent 自动化工作流指南</span>
-            <span class="text-xs text-text-tertiary">2 天前</span>
-          </a>
-          <a
-            href={getLocalizedPath('/news/rag-best-practices', lang)}
-            class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
-          >
-            <span class="text-sm text-text-primary">RAG 技术最佳实践</span>
-            <span class="text-xs text-text-tertiary">3 天前</span>
-          </a>
-          <a
-            href={getLocalizedPath('/news/llm-fine-tuning-tutorial', lang)}
-            class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
-          >
-            <span class="text-sm text-text-primary">大模型微调入门教程</span>
-            <span class="text-xs text-text-tertiary">5 天前</span>
-          </a>
+          {
+            recentBookmarks.length > 0 ? (
+              recentBookmarks.map(({ article, bookmark }) => (
+                <a
+                  href={getLocalizedPath(`/news/${article.slug}`, lang)}
+                  class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
+                >
+                  <span class="text-sm text-text-primary">{article.title}</span>
+                  <span class="text-xs text-text-tertiary">{timeAgo(bookmark.createdAt)}</span>
+                </a>
+              ))
+            ) : (
+              <div class="text-sm text-text-tertiary">暂无收藏</div>
+            )
+          }
         </div>
       </div>
     </div>

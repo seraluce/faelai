@@ -3,6 +3,8 @@
 // 功能：用户仪表盘（英文） — 个人资料卡片、数据统计、快捷操作、最近收藏
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+import { db, schema } from '@/lib/db';
+import { and, eq, desc, sql } from 'drizzle-orm';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -10,6 +12,42 @@ const t = useTranslations(lang);
 const user = Astro.locals.user;
 if (!user) {
   return Astro.redirect(getLocalizedPath('/login', lang));
+}
+
+const [{ count: myArticles }] = await db
+  .select({ count: sql<number>`count(*)` })
+  .from(schema.articles)
+  .where(eq(schema.articles.authorId, user.id));
+const [{ count: totalBookmarks }] = await db
+  .select({ count: sql<number>`count(*)` })
+  .from(schema.userBookmarks)
+  .where(eq(schema.userBookmarks.userId, user.id));
+
+const [{ count: myPublished }] = await db
+  .select({ count: sql<number>`count(*)` })
+  .from(schema.articles)
+  .where(and(eq(schema.articles.authorId, user.id), eq(schema.articles.status, 'published')));
+const myDraftCount = myArticles - myPublished;
+
+const recentBookmarks = await db
+  .select({ article: schema.articles, bookmark: schema.userBookmarks })
+  .from(schema.userBookmarks)
+  .innerJoin(schema.articles, eq(schema.userBookmarks.articleId, schema.articles.id))
+  .where(eq(schema.userBookmarks.userId, user.id))
+  .orderBy(desc(schema.userBookmarks.createdAt))
+  .limit(5);
+
+function timeAgo(date: Date | null): string {
+  if (!date) return '';
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 ---
 
@@ -21,6 +59,7 @@ if (!user) {
     </div>
 
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Profile Card */}
       <div
         class="col-span-full rounded-xl border border-border bg-card p-6 sm:col-span-2 lg:col-span-1"
       >
@@ -38,24 +77,26 @@ if (!user) {
         </div>
       </div>
 
+      {/* Quick Stats */}
       <div class="rounded-xl border border-border bg-card p-6">
         <h3 class="mb-4 font-semibold text-text-primary">My Stats</h3>
         <div class="space-y-3">
           <div class="flex justify-between">
             <span class="text-sm text-text-secondary">Published</span>
-            <span class="text-sm font-medium text-text-primary">3</span>
+            <span class="text-sm font-medium text-text-primary">{myPublished}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-sm text-text-secondary">Drafts</span>
-            <span class="text-sm font-medium text-text-primary">2</span>
+            <span class="text-sm font-medium text-text-primary">{myDraftCount}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-sm text-text-secondary">Bookmarks</span>
-            <span class="text-sm font-medium text-text-primary">12</span>
+            <span class="text-sm font-medium text-text-primary">{totalBookmarks}</span>
           </div>
         </div>
       </div>
 
+      {/* Quick Actions */}
       <div class="rounded-xl border border-border bg-card p-6">
         <h3 class="mb-4 font-semibold text-text-primary">Quick Actions</h3>
         <div class="space-y-2">
@@ -63,29 +104,64 @@ if (!user) {
             href={getLocalizedPath('/dashboard/articles', lang)}
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
-            📄 My Articles
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              ></path></svg
+            >
+            My Articles
           </a>
           <a
             href={getLocalizedPath('/dashboard/bookmarks', lang)}
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
-            ⭐ Bookmarks
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg
+            >
+            Bookmarks
           </a>
           <a
             href={getLocalizedPath('/dashboard/profile', lang)}
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
-            👤 Profile
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg
+            >
+            Profile
           </a>
           <a
             href={getLocalizedPath('/dashboard/settings', lang)}
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
-            ⚙️ Settings
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              ></path><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg
+            >
+            Settings
           </a>
         </div>
       </div>
 
+      {/* Bookmarks */}
       <div class="col-span-full rounded-xl border border-border bg-card p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-semibold text-text-primary">Recent Bookmarks</h3>
@@ -95,27 +171,21 @@ if (!user) {
           >
         </div>
         <div class="space-y-3">
-          <a
-            href={getLocalizedPath('/news/ai-agent-automation-workflow', lang)}
-            class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
-          >
-            <span class="text-sm text-text-primary">AI Agent Automation Workflow Guide</span>
-            <span class="text-xs text-text-tertiary">2 days ago</span>
-          </a>
-          <a
-            href={getLocalizedPath('/news/rag-best-practices', lang)}
-            class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
-          >
-            <span class="text-sm text-text-primary">RAG Technology Best Practices</span>
-            <span class="text-xs text-text-tertiary">3 days ago</span>
-          </a>
-          <a
-            href={getLocalizedPath('/news/llm-fine-tuning-tutorial', lang)}
-            class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
-          >
-            <span class="text-sm text-text-primary">LLM Fine-Tuning Tutorial</span>
-            <span class="text-xs text-text-tertiary">5 days ago</span>
-          </a>
+          {
+            recentBookmarks.length > 0 ? (
+              recentBookmarks.map(({ article, bookmark }) => (
+                <a
+                  href={getLocalizedPath(`/news/${article.slug}`, lang)}
+                  class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover"
+                >
+                  <span class="text-sm text-text-primary">{article.title}</span>
+                  <span class="text-xs text-text-tertiary">{timeAgo(bookmark.createdAt)}</span>
+                </a>
+              ))
+            ) : (
+              <div class="text-sm text-text-tertiary">No bookmarks yet</div>
+            )
+          }
         </div>
       </div>
     </div>

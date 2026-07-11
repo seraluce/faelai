@@ -19,7 +19,9 @@ export function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export async function sendVerificationEmail(email: string): Promise<{ success: boolean; error?: string; devCode?: string }> {
+export async function sendVerificationEmail(
+  email: string
+): Promise<{ success: boolean; error?: string; devCode?: string }> {
   const code = generateVerificationCode();
   const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 

@@ -12,7 +12,8 @@ export const GET: APIRoute = async () => {
     {
       title: 'OpenAI 发布 GPT-5，推理能力大幅提升',
       link: `${baseUrl}/zh/news/openai-releases-gpt-5-with-reasoning-capabilities`,
-      description: 'OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。',
+      description:
+        'OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。',
       pubDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toUTCString(),
       author: 'FaelAI',
     },
@@ -43,7 +44,7 @@ export const GET: APIRoute = async () => {
     <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />
     ${rssItems
       .map(
-        item => `    <item>
+        (item) => `    <item>
       <title><![CDATA[${item.title}]]></title>
       <link>${item.link}</link>
       <description><![CDATA[${item.description}]]></description>

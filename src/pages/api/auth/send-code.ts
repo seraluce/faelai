@@ -24,14 +24,17 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: '验证码已发送到你的邮箱',
-      devCode: result.devCode,
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: '验证码已发送到你的邮箱',
+        devCode: result.devCode,
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     console.error('Send code error:', error);
     return new Response(JSON.stringify({ error: '发送验证码失败' }), {

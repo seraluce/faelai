@@ -16,7 +16,7 @@ export function generateSessionToken(): string {
 
 export function hashSessionToken(token: string): string {
   return Array.from(new Uint8Array(sha256(new TextEncoder().encode(token))))
-    .map(b => b.toString(16).padStart(2, '0'))
+    .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
 
@@ -36,7 +36,7 @@ export async function createSession(userId: string) {
 
 export async function validateSession(token: string) {
   const sessionId = hashSessionToken(token);
-  
+
   const result = await db
     .select({
       session: schema.sessions,
@@ -44,12 +44,7 @@ export async function validateSession(token: string) {
     })
     .from(schema.sessions)
     .innerJoin(schema.users, eq(schema.sessions.userId, schema.users.id))
-    .where(
-      and(
-        eq(schema.sessions.id, sessionId),
-        gt(schema.sessions.expiresAt, new Date())
-      )
-    )
+    .where(and(eq(schema.sessions.id, sessionId), gt(schema.sessions.expiresAt, new Date())))
     .limit(1);
 
   if (result.length === 0) return null;

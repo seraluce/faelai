@@ -38,10 +38,13 @@ export const GET: APIRoute = async ({ params }) => {
       .set({ viewCount: (article.viewCount || 0) + 1 })
       .where(eq(schema.articles.id, article.id));
 
-    return new Response(JSON.stringify({ article: { ...article, viewCount: (article.viewCount || 0) + 1 } }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ article: { ...article, viewCount: (article.viewCount || 0) + 1 } }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     console.error('Article detail error:', error);
     return new Response(JSON.stringify({ error: '获取文章失败' }), {
@@ -72,10 +75,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const id = generateId();
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
-      .replace(/^-+|-+$/g, '') + '-' + id.slice(0, 8);
+    const slug =
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+        .replace(/^-+|-+$/g, '') +
+      '-' +
+      id.slice(0, 8);
     const readingTime = content ? calculateReadingTime(content) : undefined;
 
     await db.insert(schema.articles).values({
@@ -145,10 +151,7 @@ export const PUT: APIRoute = async ({ request, locals, params }) => {
     }
     updateData.updatedAt = new Date();
 
-    await db
-      .update(schema.articles)
-      .set(updateData)
-      .where(eq(schema.articles.id, id));
+    await db.update(schema.articles).set(updateData).where(eq(schema.articles.id, id));
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

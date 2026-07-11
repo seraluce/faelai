@@ -25,11 +25,11 @@ export function getLocalizedPath(path: string, lang: string): string {
 
 export function getAlternateLanguagePath(currentPath: string, targetLang: string): string {
   const segments = currentPath.split('/');
-  
+
   // Check if first segment is a locale
   const firstSegment = segments[1];
   const isCurrentLangNonDefault = firstSegment in ui && firstSegment !== defaultLang;
-  
+
   if (targetLang === defaultLang) {
     // Going to default locale: remove locale prefix
     if (isCurrentLangNonDefault) {
@@ -38,14 +38,14 @@ export function getAlternateLanguagePath(currentPath: string, targetLang: string
     }
     return currentPath;
   }
-  
+
   // Going to non-default locale
   if (isCurrentLangNonDefault) {
     // Already has a locale prefix, replace it
     segments[1] = targetLang;
     return segments.join('/');
   }
-  
+
   // Currently at default locale (no prefix), add target locale prefix
   return `/${targetLang}${currentPath}`;
 }

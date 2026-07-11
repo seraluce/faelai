@@ -12,7 +12,7 @@ const publicPaths = [
 ];
 
 function isPublicApiPath(pathname: string): boolean {
-  return publicPaths.some(p => pathname.startsWith(p));
+  return publicPaths.some((p) => pathname.startsWith(p));
 }
 
 function getLoginRedirect(pathname: string): string {

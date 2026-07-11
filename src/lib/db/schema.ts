@@ -21,20 +21,26 @@ export const users = sqliteTable('users', {
 });
 
 export const userPasswords = sqliteTable('user_passwords', {
-  userId: text('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
   passwordHash: text('password_hash').notNull(),
 });
 
 export const sessions = sqliteTable('sessions', {
   id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
 export const oauthAccounts = sqliteTable('oauth_accounts', {
   id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   provider: text('provider').notNull(), // 'github' | 'google'
   providerUserId: text('provider_user_id').notNull(),
   email: text('email'),
@@ -94,8 +100,12 @@ export const articles = sqliteTable('articles', {
 });
 
 export const articleTags = sqliteTable('article_tags', {
-  articleId: text('article_id').notNull().references(() => articles.id, { onDelete: 'cascade' }),
-  tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' }),
+  articleId: text('article_id')
+    .notNull()
+    .references(() => articles.id, { onDelete: 'cascade' }),
+  tagId: text('tag_id')
+    .notNull()
+    .references(() => tags.id, { onDelete: 'cascade' }),
 });
 
 // ============================================================
@@ -122,7 +132,9 @@ export const feeds = sqliteTable('feeds', {
 // ============================================================
 
 export const trendingScores = sqliteTable('trending_scores', {
-  articleId: text('article_id').primaryKey().references(() => articles.id, { onDelete: 'cascade' }),
+  articleId: text('article_id')
+    .primaryKey()
+    .references(() => articles.id, { onDelete: 'cascade' }),
   score: real('score').default(0),
   computedAt: integer('computed_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
@@ -132,14 +144,22 @@ export const trendingScores = sqliteTable('trending_scores', {
 // ============================================================
 
 export const userBookmarks = sqliteTable('user_bookmarks', {
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  articleId: text('article_id').notNull().references(() => articles.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  articleId: text('article_id')
+    .notNull()
+    .references(() => articles.id, { onDelete: 'cascade' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
 export const userLikes = sqliteTable('user_likes', {
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  articleId: text('article_id').notNull().references(() => articles.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  articleId: text('article_id')
+    .notNull()
+    .references(() => articles.id, { onDelete: 'cascade' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 

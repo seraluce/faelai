@@ -13,7 +13,9 @@ if (Astro.locals.user) {
 ---
 
 <BaseLayout title={t('auth.register.title')}>
-  <div class="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md items-center justify-center px-4 py-12">
+  <div
+    class="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md items-center justify-center px-4 py-12"
+  >
     <div class="w-full">
       <div class="mb-8 text-center">
         <h1 class="text-2xl font-bold text-text-primary">{t('auth.register.title')}</h1>
@@ -107,7 +109,8 @@ if (Astro.locals.user) {
           />
         </div>
 
-        <div id="error-message" class="hidden rounded-lg bg-error/10 px-4 py-3 text-sm text-error"></div>
+        <div id="error-message" class="hidden rounded-lg bg-error/10 px-4 py-3 text-sm text-error">
+        </div>
 
         <button
           type="submit"

@@ -1,7 +1,7 @@
 /* src/styles/global.css */
 /* 功能：全局样式 — Tailwind v4 主题配置（深浅模式）、表单验证红色边框、排版、滚动条、动画 */
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -11,37 +11,37 @@
   --color-background-secondary: #0a0a0a;
   --color-background-tertiary: #111111;
   --color-background-hover: #1a1a1a;
-  
+
   /* Borders */
   --color-border: #1f1f1f;
   --color-border-strong: #333333;
-  
+
   /* Text */
   --color-text-primary: #ededed;
   --color-text-secondary: #a1a1aa;
   --color-text-tertiary: #71717a;
   --color-text-disabled: #525252;
-  
+
   /* Accent */
   --color-accent: #0070f3;
   --color-accent-hover: #0060df;
   --color-accent-light: rgba(0, 112, 243, 0.1);
-  
+
   /* Status */
   --color-success: #00c853;
   --color-warning: #ff9100;
   --color-error: #ff1744;
-  
+
   /* Semantic */
   --color-card: #0a0a0a;
   --color-card-hover: #111111;
   --color-muted: #1a1a1a;
   --color-muted-foreground: #a1a1aa;
-  
+
   /* Typography */
   --font-sans: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
-  
+
   /* Border radius */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -56,15 +56,15 @@
   --color-background-secondary: #fafafa;
   --color-background-tertiary: #f5f5f5;
   --color-background-hover: #f0f0f0;
-  
+
   --color-border: #e5e5e5;
   --color-border-strong: #d4d4d4;
-  
+
   --color-text-primary: #171717;
   --color-text-secondary: #525252;
   --color-text-tertiary: #a3a3a3;
   --color-text-disabled: #d4d4d4;
-  
+
   --color-card: #fafafa;
   --color-card-hover: #f5f5f5;
   --color-muted: #f5f5f5;
@@ -117,24 +117,33 @@ body {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { 
+  from {
     opacity: 0;
     transform: translateY(10px);
   }
-  to { 
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .animate-fade-in {
@@ -177,16 +186,25 @@ select:focus {
   line-height: 1.75;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
   color: var(--color-text-primary);
   font-weight: 600;
   margin-top: 1.5em;
   margin-bottom: 0.75em;
 }
 
-.prose h1 { font-size: 2rem; }
-.prose h2 { font-size: 1.5rem; }
-.prose h3 { font-size: 1.25rem; }
+.prose h1 {
+  font-size: 2rem;
+}
+.prose h2 {
+  font-size: 1.5rem;
+}
+.prose h3 {
+  font-size: 1.25rem;
+}
 
 .prose p {
   margin-bottom: 1em;
@@ -234,7 +252,8 @@ select:focus {
   color: var(--color-text-secondary);
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
   margin: 1em 0;
   padding-left: 1.5em;
 }
@@ -255,7 +274,8 @@ select:focus {
   margin: 1.5em 0;
 }
 
-.prose th, .prose td {
+.prose th,
+.prose td {
   border: 1px solid var(--color-border);
   padding: 0.75em;
   text-align: left;
@@ -279,14 +299,22 @@ select:focus {
 }
 
 @keyframes skeleton {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Ticker animation for breaking news */
 @keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .ticker-animate {

@@ -13,7 +13,8 @@ const featuredArticles = [
   {
     title: 'OpenAI 发布 GPT-5，推理能力大幅提升',
     slug: 'openai-releases-gpt-5-with-reasoning-capabilities',
-    excerpt: 'OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。',
+    excerpt:
+      'OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。',
     coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
     sourceName: 'OpenAI Blog',
     publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
@@ -22,7 +23,8 @@ const featuredArticles = [
   {
     title: 'Anthropic 发布 Claude 4 安全研究报告',
     slug: 'anthropic-claude-4-safety-research',
-    excerpt: 'Anthropic 发布了关于 Claude 4 安全性的深度研究报告，展示了在 AI 安全对齐方面的最新进展。',
+    excerpt:
+      'Anthropic 发布了关于 Claude 4 安全性的深度研究报告，展示了在 AI 安全对齐方面的最新进展。',
     coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80',
     sourceName: 'Anthropic',
     publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
@@ -137,8 +139,10 @@ const categories = [
         <span class="shrink-0 bg-accent px-3 py-2 text-xs font-semibold text-white">BREAKING</span>
         <div class="relative flex-1 overflow-hidden">
           <div class="ticker-animate flex whitespace-nowrap py-2">
-            <span class="mx-8 text-sm text-text-secondary">OpenAI 发布 GPT-5，推理能力大幅提升</span>
-            <span class="mx-8 text-sm text-text-secondary">Anthropic Claude 4 安全研究报告发布</span>
+            <span class="mx-8 text-sm text-text-secondary">OpenAI 发布 GPT-5，推理能力大幅提升</span
+            >
+            <span class="mx-8 text-sm text-text-secondary">Anthropic Claude 4 安全研究报告发布</span
+            >
             <span class="mx-8 text-sm text-text-secondary">Google DeepMind 蛋白质折叠新突破</span>
             <span class="mx-8 text-sm text-text-secondary">Meta Llama 4 开源模型发布</span>
           </div>
@@ -182,9 +186,7 @@ const categories = [
           </a>
         </div>
         <div class="grid gap-6 sm:grid-cols-2">
-          {latestArticles.map(article => (
-            <NewsCard {...article} />
-          ))}
+          {latestArticles.map((article) => <NewsCard {...article} />)}
         </div>
       </div>
 
@@ -194,23 +196,28 @@ const categories = [
         <div class="rounded-xl border border-border bg-card p-6">
           <h3 class="mb-4 text-lg font-semibold text-text-primary">{t('home.trending')}</h3>
           <ul class="space-y-4">
-            {trendingArticles.map((article, index) => (
-              <li>
-                <a href={getLocalizedPath('/news/' + article.slug, lang)} class="group flex gap-3">
-                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-text-tertiary">
-                    {index + 1}
-                  </span>
-                  <div>
-                    <p class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
-                      {article.title}
-                    </p>
-                    <p class="text-xs text-text-tertiary">
-                      {article.viewCount.toLocaleString()} views
-                    </p>
-                  </div>
-                </a>
-              </li>
-            ))}
+            {
+              trendingArticles.map((article, index) => (
+                <li>
+                  <a
+                    href={getLocalizedPath('/news/' + article.slug, lang)}
+                    class="group flex gap-3"
+                  >
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-text-tertiary">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <p class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
+                        {article.title}
+                      </p>
+                      <p class="text-xs text-text-tertiary">
+                        {article.viewCount.toLocaleString()} views
+                      </p>
+                    </div>
+                  </a>
+                </li>
+              ))
+            }
           </ul>
         </div>
 
@@ -218,15 +225,20 @@ const categories = [
         <div class="rounded-xl border border-border bg-card p-6">
           <h3 class="mb-4 text-lg font-semibold text-text-primary">{t('home.hot')}</h3>
           <div class="flex flex-wrap gap-2">
-            {hotTopics.map(topic => (
-              <a
-                href={getLocalizedPath('/tag/' + topic.name.toLowerCase().replace(/\s+/g, '-'), lang)}
-                class="rounded-full border border-border px-3 py-1.5 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
-              >
-                {topic.name}
-                <span class="ml-1 text-xs text-text-tertiary">({topic.count})</span>
-              </a>
-            ))}
+            {
+              hotTopics.map((topic) => (
+                <a
+                  href={getLocalizedPath(
+                    '/tag/' + topic.name.toLowerCase().replace(/\s+/g, '-'),
+                    lang
+                  )}
+                  class="rounded-full border border-border px-3 py-1.5 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
+                >
+                  {topic.name}
+                  <span class="ml-1 text-xs text-text-tertiary">({topic.count})</span>
+                </a>
+              ))
+            }
           </div>
         </div>
 
@@ -257,15 +269,17 @@ const categories = [
     <div class="mx-auto max-w-7xl px-4">
       <h2 class="mb-8 text-xl font-semibold text-text-primary">探索分类</h2>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
-        {categories.map(category => (
-          <a
-            href={getLocalizedPath('/category/' + category.slug, lang)}
-            class="group flex flex-col items-center rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
-          >
-            <span class="mb-3 text-3xl">{category.icon}</span>
-            <span class="text-sm font-medium text-text-primary">{category.name}</span>
-          </a>
-        ))}
+        {
+          categories.map((category) => (
+            <a
+              href={getLocalizedPath('/category/' + category.slug, lang)}
+              class="group flex flex-col items-center rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
+            >
+              <span class="mb-3 text-3xl">{category.icon}</span>
+              <span class="text-sm font-medium text-text-primary">{category.name}</span>
+            </a>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -275,12 +289,16 @@ const categories = [
   .ticker-animate {
     animation: ticker 30s linear infinite;
   }
-  
+
   @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
   }
-  
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

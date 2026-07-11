@@ -65,13 +65,19 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { token } = await createSession(user.id);
 
-    return new Response(JSON.stringify({ success: true, user: { id: user.id, username: user.username, role: user.role } }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': setSessionCookie(token),
-      },
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        user: { id: user.id, username: user.username, role: user.role },
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Set-Cookie': setSessionCookie(token),
+        },
+      }
+    );
   } catch (error) {
     console.error('Login error:', error);
     return new Response(JSON.stringify({ error: '登录失败，请稍后重试' }), {

@@ -38,7 +38,7 @@ export async function fetchRSSFeed(url: string): Promise<RSSFeed> {
       title: feed.title || '',
       description: feed.description || '',
       link: feed.link || '',
-      items: (feed.items || []).map(item => ({
+      items: (feed.items || []).map((item) => ({
         title: item.title || '',
         link: item.link || '',
         description: item.contentSnippet || item.content || '',

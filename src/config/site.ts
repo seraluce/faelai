@@ -5,8 +5,10 @@ export const siteConfig = {
   name: 'FaelAI',
   title: 'AI 资讯与工具平台',
   titleEn: 'AI News & Tools Platform',
-  description: '聚合全球 AI 新闻资讯，追踪人工智能领域最新动态。未来将支持 API Key 购买、AI 工具部署等更多功能。',
-  descriptionEn: 'Aggregating global AI news and tracking the latest developments in artificial intelligence. Future features include API key sales, AI tool deployment, and more.',
+  description:
+    '聚合全球 AI 新闻资讯，追踪人工智能领域最新动态。未来将支持 API Key 购买、AI 工具部署等更多功能。',
+  descriptionEn:
+    'Aggregating global AI news and tracking the latest developments in artificial intelligence. Future features include API key sales, AI tool deployment, and more.',
   url: import.meta.env.PUBLIC_SITE_URL || 'https://faelai.com',
   locale: {
     default: 'zh',
@@ -23,12 +25,48 @@ export const siteConfig = {
 
   // 分类（icon 为 lucide 图标名）
   categories: [
-    { path: '/category/ai-companies', zh: 'AI 公司', en: 'AI Companies', icon: 'building-2', color: '#0070f3' },
-    { path: '/category/research', zh: '学术研究', en: 'Research', icon: 'book-open', color: '#7928ca' },
-    { path: '/category/ai-products', zh: 'AI 产品', en: 'AI Products', icon: 'rocket', color: '#ff0080' },
-    { path: '/category/industry', zh: '行业动态', en: 'Industry', icon: 'bar-chart-3', color: '#f5a623' },
-    { path: '/category/open-source', zh: '开源项目', en: 'Open Source', icon: 'code-2', color: '#50e3c2' },
-    { path: '/category/ai-ethics', zh: 'AI 伦理', en: 'AI Ethics', icon: 'scale', color: '#ee0000' },
+    {
+      path: '/category/ai-companies',
+      zh: 'AI 公司',
+      en: 'AI Companies',
+      icon: 'building-2',
+      color: '#0070f3',
+    },
+    {
+      path: '/category/research',
+      zh: '学术研究',
+      en: 'Research',
+      icon: 'book-open',
+      color: '#7928ca',
+    },
+    {
+      path: '/category/ai-products',
+      zh: 'AI 产品',
+      en: 'AI Products',
+      icon: 'rocket',
+      color: '#ff0080',
+    },
+    {
+      path: '/category/industry',
+      zh: '行业动态',
+      en: 'Industry',
+      icon: 'bar-chart-3',
+      color: '#f5a623',
+    },
+    {
+      path: '/category/open-source',
+      zh: '开源项目',
+      en: 'Open Source',
+      icon: 'code-2',
+      color: '#50e3c2',
+    },
+    {
+      path: '/category/ai-ethics',
+      zh: 'AI 伦理',
+      en: 'AI Ethics',
+      icon: 'scale',
+      color: '#ee0000',
+    },
   ],
 
   // 热门话题标签

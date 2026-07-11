@@ -1,0 +1,225 @@
+---
+// src/pages/admin/articles/index.astro
+// 功能：文章管理页面 — 文章列表、状态筛选、搜索、批量操作、分页
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout>
+  <div class="px-4 py-8 md:px-8">
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-text-primary">{t('admin.articles')}</h1>
+        <p class="mt-1 text-text-secondary">管理所有文章内容</p>
+      </div>
+      <a
+        href="/admin/articles/new"
+        class="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"
+          ></path></svg
+        >
+        发布文章
+      </a>
+    </div>
+
+    {/* 搜索与筛选 */}
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row">
+      <div class="relative flex-1">
+        <svg
+          class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          ><path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg
+        >
+        <input
+          type="text"
+          id="search-input"
+          placeholder="搜索文章标题..."
+          class="w-full rounded-lg border border-border bg-background py-2 pl-10 pr-4 text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+        />
+      </div>
+      <select
+        id="status-filter"
+        class="rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+      >
+        <option value="">全部状态</option>
+        <option value="published">已发布</option>
+        <option value="draft">草稿</option>
+        <option value="archived">已归档</option>
+      </select>
+      <select
+        id="lang-filter"
+        class="rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+      >
+        <option value="">全部语言</option>
+        <option value="zh">中文</option>
+        <option value="en">英文</option>
+      </select>
+    </div>
+
+    {/* 文章列表 */}
+    <div class="rounded-xl border border-border bg-card">
+      <div class="border-b border-border px-4 py-3">
+        <div class="flex items-center justify-between">
+          <span id="article-count" class="text-sm text-text-secondary">加载中...</span>
+          <div class="flex items-center gap-2">
+            <button
+              id="btn-delete-selected"
+              class="hidden rounded-lg border border-border px-3 py-1.5 text-xs text-text-secondary transition-colors hover:border-error hover:text-error"
+            >
+              删除选中
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="article-list" class="divide-y divide-border">
+        <div class="p-8 text-center text-text-tertiary">加载中...</div>
+      </div>
+      {/* 分页 */}
+      <div id="pagination" class="border-t border-border px-4 py-3"></div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  let currentPage = 1;
+  const limit = 20;
+  let selectedIds: Set<string> = new Set();
+
+  async function loadArticles() {
+    const search = (document.getElementById('search-input') as HTMLInputElement)?.value || '';
+    const status = (document.getElementById('status-filter') as HTMLSelectElement)?.value || '';
+    const lang = (document.getElementById('lang-filter') as HTMLSelectElement)?.value || '';
+
+    const params = new URLSearchParams({ page: String(currentPage), limit: String(limit) });
+    if (search) params.set('search', search);
+    if (status) params.set('status', status);
+    if (lang) params.set('lang', lang);
+
+    try {
+      const res = await fetch(`/api/articles?${params}`);
+      const data = await res.json();
+      const { articles, pagination } = data;
+
+      document.getElementById('article-count').textContent = `共 ${pagination.total} 篇文章`;
+      const listEl = document.getElementById('article-list');
+
+      if (!articles || articles.length === 0) {
+        listEl.innerHTML = `<div class="p-8 text-center text-text-tertiary">暂无文章</div>`;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      listEl.innerHTML = articles
+        .map((a) => {
+          const statusClass =
+            a.status === 'published'
+              ? 'bg-success/10 text-success'
+              : a.status === 'draft'
+                ? 'bg-warning/10 text-warning'
+                : 'bg-text-tertiary/10 text-text-tertiary';
+          const statusLabel =
+            a.status === 'published' ? '已发布' : a.status === 'draft' ? '草稿' : '已归档';
+          const date = a.publishedAt
+            ? new Date(a.publishedAt).toLocaleDateString('zh-CN')
+            : new Date(a.createdAt).toLocaleDateString('zh-CN');
+          return `
+          <div class="flex items-center gap-4 px-4 py-3 hover:bg-background-hover">
+            <input type="checkbox" data-id="${a.id}" class="article-checkbox h-4 w-4 rounded border-border accent-accent" />
+            <div class="min-w-0 flex-1">
+              <a href="/admin/articles/${a.id}" class="text-sm font-medium text-text-primary hover:text-accent">${a.title}</a>
+              <div class="mt-1 flex items-center gap-3 text-xs text-text-tertiary">
+                <span>${a.author || '未知作者'}</span>
+                <span>${date}</span>
+                ${a.viewCount ? `<span>${a.viewCount} 阅读</span>` : ''}
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="rounded-full px-2 py-0.5 text-xs font-medium ${statusClass}">${statusLabel}</span>
+              <a href="/admin/articles/${a.id}" class="rounded p-1 text-text-tertiary transition-colors hover:bg-background-hover hover:text-text-primary">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              </a>
+            </div>
+          </div>
+        `;
+        })
+        .join('');
+
+      // Checkbox events
+      listEl.querySelectorAll('.article-checkbox').forEach((cb) => {
+        cb.addEventListener('change', () => {
+          const id = (cb as HTMLInputElement).dataset.id;
+          if ((cb as HTMLInputElement).checked) selectedIds.add(id);
+          else selectedIds.delete(id);
+          document
+            .getElementById('btn-delete-selected')
+            .classList.toggle('hidden', selectedIds.size === 0);
+        });
+      });
+
+      // Pagination
+      const paginationEl = document.getElementById('pagination');
+      if (pagination.totalPages > 1) {
+        let pages = '';
+        for (let i = 1; i <= pagination.totalPages; i++) {
+          pages += `<button data-page="${i}" class="rounded px-3 py-1 text-sm ${i === currentPage ? 'bg-accent text-white' : 'text-text-secondary hover:bg-background-hover'}">${i}</button>`;
+        }
+        paginationEl.innerHTML = `<div class="flex items-center justify-center gap-1">${pages}</div>`;
+        paginationEl.querySelectorAll('button').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            currentPage = parseInt(btn.dataset.page);
+            loadArticles();
+          });
+        });
+      } else {
+        paginationEl.innerHTML = '';
+      }
+    } catch {
+      document.getElementById('article-list').innerHTML =
+        `<div class="p-8 text-center text-error">加载失败</div>`;
+    }
+  }
+
+  document.getElementById('search-input')?.addEventListener('input', () => {
+    currentPage = 1;
+    loadArticles();
+  });
+  document.getElementById('status-filter')?.addEventListener('change', () => {
+    currentPage = 1;
+    loadArticles();
+  });
+  document.getElementById('lang-filter')?.addEventListener('change', () => {
+    currentPage = 1;
+    loadArticles();
+  });
+
+  document.getElementById('btn-delete-selected')?.addEventListener('click', async () => {
+    if (!confirm(`确定删除 ${selectedIds.size} 篇文章？`)) return;
+    for (const id of selectedIds) {
+      await fetch('/api/articles/slug', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+    }
+    selectedIds.clear();
+    loadArticles();
+  });
+
+  loadArticles();
+</script>

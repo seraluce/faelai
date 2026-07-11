@@ -1,7 +1,12 @@
 ---
 // src/components/layout/Header.astro
 // 功能：网站头部导航 — Logo、导航链接、分类/话题下拉菜单、搜索、语言切换、主题切换、用户认证状态、移动端菜单
-import { getLangFromUrl, useTranslations, getLocalizedPath, getAlternateLanguagePath } from '@/i18n/utils';
+import {
+  getLangFromUrl,
+  useTranslations,
+  getLocalizedPath,
+  getAlternateLanguagePath,
+} from '@/i18n/utils';
 import { siteConfig } from '@/config/site';
 
 const lang = getLangFromUrl(Astro.url);
@@ -10,7 +15,7 @@ const currentPath = Astro.url.pathname;
 
 function getLabel(item: { zh?: string; en?: string; labelKey?: string }): string {
   if (item.labelKey) return t(item.labelKey as any);
-  return lang === 'en' ? (item.en || item.zh || '') : (item.zh || item.en || '');
+  return lang === 'en' ? item.en || item.zh || '' : item.zh || item.en || '';
 }
 
 const otherLang = lang === 'zh' ? 'en' : 'zh';
@@ -20,12 +25,18 @@ const user = Astro.locals.user;
 
 // Lucide SVG icon map for categories
 const categoryIcons: Record<string, string> = {
-  'building-2': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h2m10-12h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-6 0h6M6 8h8M6 16h8" />',
-  'book-open': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />',
-  'rocket': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3M22 2l-7 7m0 0l-3-3m3 3l3-3" />',
-  'bar-chart-3': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 20V10M12 20V4M6 20v-6" />',
-  'code-2': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7l-5 5 5 5M7 7l5 5-5 5" />',
-  'scale': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />',
+  'building-2':
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h2m10-12h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-6 0h6M6 8h8M6 16h8" />',
+  'book-open':
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />',
+  rocket:
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3M22 2l-7 7m0 0l-3-3m3 3l3-3" />',
+  'bar-chart-3':
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 20V10M12 20V4M6 20v-6" />',
+  'code-2':
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7l-5 5 5 5M7 7l5 5-5 5" />',
+  scale:
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />',
 };
 ---
 
@@ -38,57 +49,79 @@ const categoryIcons: Record<string, string> = {
 
     {/* Desktop Nav */}
     <nav class="hidden items-center gap-6 md:flex">
-      {siteConfig.nav.map(link => (
-        <a
-          href={getLocalizedPath(link.path, lang)}
-          class={`flex items-center text-sm transition-colors hover:text-text-primary ${
-            currentPath === getLocalizedPath(link.path, lang)
-              ? 'font-medium text-text-primary'
-              : 'text-text-secondary'
-          }`}
-        >
-          {t(link.labelKey as any)}
-        </a>
-      ))}
+      {
+        siteConfig.nav.map((link) => (
+          <a
+            href={getLocalizedPath(link.path, lang)}
+            class={`flex items-center text-sm transition-colors hover:text-text-primary ${
+              currentPath === getLocalizedPath(link.path, lang)
+                ? 'font-medium text-text-primary'
+                : 'text-text-secondary'
+            }`}
+          >
+            {t(link.labelKey as any)}
+          </a>
+        ))
+      }
 
       {/* Categories Dropdown */}
       <div class="relative group">
-        <button class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary">
+        <button
+          class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary"
+        >
           {t('nav.categories')}
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+            ></path>
           </svg>
         </button>
-        <div class="invisible absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 rounded-xl border border-border bg-background-secondary p-2 opacity-0 shadow-2xl transition-all group-hover:visible group-hover:opacity-100">
-          {siteConfig.categories.map(cat => (
-            <a
-              href={getLocalizedPath(cat.path, lang)}
-              class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
-            >
-              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={categoryIcons[cat.icon] || ''} />
-              <span>{getLabel(cat)}</span>
-            </a>
-          ))}
+        <div
+          class="invisible absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 rounded-xl border border-border bg-background-secondary p-2 opacity-0 shadow-2xl transition-all group-hover:visible group-hover:opacity-100"
+        >
+          {
+            siteConfig.categories.map((cat) => (
+              <a
+                href={getLocalizedPath(cat.path, lang)}
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+              >
+                <svg
+                  class="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  set:html={categoryIcons[cat.icon] || ''}
+                />
+                <span>{getLabel(cat)}</span>
+              </a>
+            ))
+          }
         </div>
       </div>
 
       {/* Topics Dropdown */}
       <div class="relative group">
-        <button class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary">
+        <button
+          class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary"
+        >
           {t('nav.topics')}
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+            ></path>
           </svg>
         </button>
-        <div class="invisible absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-background-secondary p-2 opacity-0 shadow-2xl transition-all group-hover:visible group-hover:opacity-100">
-          {siteConfig.topics.map(topic => (
-            <a
-              href={getLocalizedPath(topic.path, lang)}
-              class="block rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
-            >
-              {getLabel(topic)}
-            </a>
-          ))}
+        <div
+          class="invisible absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-background-secondary p-2 opacity-0 shadow-2xl transition-all group-hover:visible group-hover:opacity-100"
+        >
+          {
+            siteConfig.topics.map((topic) => (
+              <a
+                href={getLocalizedPath(topic.path, lang)}
+                class="block rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+              >
+                {getLabel(topic)}
+              </a>
+            ))
+          }
         </div>
       </div>
     </nav>
@@ -102,7 +135,11 @@ const categoryIcons: Record<string, string> = {
         aria-label={t('nav.search')}
       >
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
       </a>
 
@@ -121,41 +158,52 @@ const categoryIcons: Record<string, string> = {
         aria-label="Toggle theme"
       >
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+          ></path>
         </svg>
       </button>
 
       {/* Auth */}
-      {user ? (
-        <a
-          href={getLocalizedPath('/dashboard', lang)}
-          class="flex h-9 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
-        >
-          {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt={user.username} class="h-6 w-6 rounded-full object-cover" />
-          ) : (
-            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs">
-              {(user.fullName || user.username)[0].toUpperCase()}
-            </div>
-          )}
-          <span class="hidden sm:inline">{user.username}</span>
-        </a>
-      ) : (
-        <div class="hidden items-center gap-2 md:flex">
+      {
+        user ? (
           <a
-            href={getLocalizedPath('/login', lang)}
-            class="rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+            href={getLocalizedPath('/dashboard', lang)}
+            class="flex h-9 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
           >
-            {t('nav.login')}
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.username}
+                class="h-6 w-6 rounded-full object-cover"
+              />
+            ) : (
+              <div class="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs">
+                {(user.fullName || user.username)[0].toUpperCase()}
+              </div>
+            )}
+            <span class="hidden sm:inline">{user.username}</span>
           </a>
-          <a
-            href={getLocalizedPath('/register', lang)}
-            class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
-          >
-            {t('nav.register')}
-          </a>
-        </div>
-      )}
+        ) : (
+          <div class="hidden items-center gap-2 md:flex">
+            <a
+              href={getLocalizedPath('/login', lang)}
+              class="rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+            >
+              {t('nav.login')}
+            </a>
+            <a
+              href={getLocalizedPath('/register', lang)}
+              class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            >
+              {t('nav.register')}
+            </a>
+          </div>
+        )
+      }
 
       {/* Mobile Menu */}
       <button
@@ -164,7 +212,11 @@ const categoryIcons: Record<string, string> = {
         aria-label="Menu"
       >
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
     </div>
@@ -173,49 +225,63 @@ const categoryIcons: Record<string, string> = {
   {/* Mobile Menu Panel */}
   <div id="mobile-menu" class="hidden border-t border-border bg-background md:hidden">
     <nav class="flex flex-col p-4">
-      {siteConfig.nav.map(link => (
-        <a
-          href={getLocalizedPath(link.path, lang)}
-          class="rounded-lg px-4 py-3 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
-        >
-          {t(link.labelKey as any)}
-        </a>
-      ))}
-      <div class="my-2 border-t border-border" />
-      <p class="px-4 py-2 text-xs font-medium uppercase tracking-wider text-text-tertiary">{t('nav.categories')}</p>
-      {siteConfig.categories.map(cat => (
-        <a
-          href={getLocalizedPath(cat.path, lang)}
-          class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
-        >
-          <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={categoryIcons[cat.icon] || ''} />
-          <span>{getLabel(cat)}</span>
-        </a>
-      ))}
-      <div class="my-2 border-t border-border" />
-      {user ? (
-        <a
-          href={getLocalizedPath('/dashboard', lang)}
-          class="rounded-lg px-4 py-3 text-sm font-medium text-accent transition-colors hover:bg-background-hover"
-        >
-          {t('nav.dashboard')}
-        </a>
-      ) : (
-        <>
+      {
+        siteConfig.nav.map((link) => (
           <a
-            href={getLocalizedPath('/login', lang)}
+            href={getLocalizedPath(link.path, lang)}
             class="rounded-lg px-4 py-3 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
-            {t('nav.login')}
+            {t(link.labelKey as any)}
           </a>
+        ))
+      }
+      <div class="my-2 border-t border-border"></div>
+      <p class="px-4 py-2 text-xs font-medium uppercase tracking-wider text-text-tertiary">
+        {t('nav.categories')}
+      </p>
+      {
+        siteConfig.categories.map((cat) => (
           <a
-            href={getLocalizedPath('/register', lang)}
-            class="mt-2 rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            href={getLocalizedPath(cat.path, lang)}
+            class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
-            {t('nav.register')}
+            <svg
+              class="h-4 w-4 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              set:html={categoryIcons[cat.icon] || ''}
+            />
+            <span>{getLabel(cat)}</span>
           </a>
-        </>
-      )}
+        ))
+      }
+      <div class="my-2 border-t border-border"></div>
+      {
+        user ? (
+          <a
+            href={getLocalizedPath('/dashboard', lang)}
+            class="rounded-lg px-4 py-3 text-sm font-medium text-accent transition-colors hover:bg-background-hover"
+          >
+            {t('nav.dashboard')}
+          </a>
+        ) : (
+          <>
+            <a
+              href={getLocalizedPath('/login', lang)}
+              class="rounded-lg px-4 py-3 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+            >
+              {t('nav.login')}
+            </a>
+            <a
+              href={getLocalizedPath('/register', lang)}
+              class="mt-2 rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            >
+              {t('nav.register')}
+            </a>
+          </>
+        )
+      }
     </nav>
   </div>
 </header>

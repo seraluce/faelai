@@ -1,6 +1,6 @@
 ---
-// src/pages/admin/settings/index.astro
-// 功能：系统设置页面 — 站点信息编辑、系统状态、数据统计、快捷操作
+// src/pages/en/admin/settings/index.astro
+// 功能：系统设置页面（英文版）— 站点信息编辑、系统状态、数据统计、快捷操作
 import AdminLayout from '@/layouts/AdminLayout.astro';
 import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 import { db, schema } from '@/lib/db';
@@ -10,7 +10,7 @@ const t = useTranslations(lang);
 const user = Astro.locals.user;
 
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect('/en/login');
 }
 
 const settingsRows = await db.select().from(schema.siteSettings);
@@ -24,16 +24,16 @@ for (const row of settingsRows) {
   <div class="px-4 py-8 md:px-8">
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-text-primary">{t('admin.settings')}</h1>
-      <p class="mt-1 text-text-secondary">系统配置与信息</p>
+      <p class="mt-1 text-text-secondary">System configuration and information</p>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">
-      {/* 站点信息 */}
+      {/* Site Info */}
       <div class="rounded-xl border border-border bg-card p-6">
-        <h2 class="mb-4 text-lg font-semibold text-text-primary">站点信息</h2>
+        <h2 class="mb-4 text-lg font-semibold text-text-primary">Site Information</h2>
         <form id="settings-form" class="space-y-4">
           <div>
-            <label class="mb-1 block text-sm font-medium text-text-secondary">站点名称</label>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Site Name</label>
             <input
               type="text"
               id="site-name"
@@ -42,16 +42,18 @@ for (const row of settingsRows) {
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-text-secondary">站点描述</label>
+            <label class="mb-1 block text-sm font-medium text-text-secondary"
+              >Site Description</label
+            >
             <textarea
               id="site-description"
               rows="2"
               class="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-text-primary focus:border-accent focus:outline-none"
-              >{settings.siteDescription || 'AI 新闻聚合平台'}</textarea
+              >{settings.siteDescription || 'AI News Aggregation Platform'}</textarea
             >
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-text-secondary">站点 URL</label>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Site URL</label>
             <input
               type="url"
               id="site-url"
@@ -62,17 +64,21 @@ for (const row of settingsRows) {
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="mb-1 block text-sm font-medium text-text-secondary">默认语言</label>
+              <label class="mb-1 block text-sm font-medium text-text-secondary"
+                >Default Language</label
+              >
               <select
                 id="site-lang"
                 class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
               >
-                <option value="zh" selected={settings.siteLang !== 'en'}>中文</option>
+                <option value="zh" selected={settings.siteLang !== 'en'}>Chinese</option>
                 <option value="en" selected={settings.siteLang === 'en'}>English</option>
               </select>
             </div>
             <div>
-              <label class="mb-1 block text-sm font-medium text-text-secondary">每页文章数</label>
+              <label class="mb-1 block text-sm font-medium text-text-secondary"
+                >Articles Per Page</label
+              >
               <input
                 type="number"
                 id="page-size"
@@ -87,59 +93,59 @@ for (const row of settingsRows) {
           <button
             type="submit"
             class="rounded-lg bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
-            >保存设置</button
+            >Save Settings</button
           >
         </form>
       </div>
 
-      {/* 系统状态 */}
+      {/* System Status */}
       <div class="rounded-xl border border-border bg-card p-6">
-        <h2 class="mb-4 text-lg font-semibold text-text-primary">系统状态</h2>
+        <h2 class="mb-4 text-lg font-semibold text-text-primary">System Status</h2>
         <div class="space-y-3 text-sm">
           <div class="flex justify-between">
-            <span class="text-text-secondary">数据库状态</span>
-            <span id="db-status" class="text-warning">检测中...</span>
+            <span class="text-text-secondary">Database Status</span>
+            <span id="db-status" class="text-warning">Checking...</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-text-secondary">Node.js 版本</span>
+            <span class="text-text-secondary">Node.js Version</span>
             <span class="text-text-primary">--</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-text-secondary">运行环境</span>
-            <span class="text-text-primary">开发模式</span>
+            <span class="text-text-secondary">Environment</span>
+            <span class="text-text-primary">Development</span>
           </div>
         </div>
       </div>
 
-      {/* 数据统计 */}
+      {/* Data Statistics */}
       <div class="rounded-xl border border-border bg-card p-6">
-        <h2 class="mb-4 text-lg font-semibold text-text-primary">数据统计</h2>
+        <h2 class="mb-4 text-lg font-semibold text-text-primary">Data Statistics</h2>
         <div class="grid grid-cols-2 gap-4">
           <div class="rounded-lg bg-background p-4 text-center">
             <p id="stat-articles" class="text-2xl font-bold text-accent">--</p>
-            <p class="text-xs text-text-secondary">文章总数</p>
+            <p class="text-xs text-text-secondary">Total Articles</p>
           </div>
           <div class="rounded-lg bg-background p-4 text-center">
             <p id="stat-users" class="text-2xl font-bold text-accent">--</p>
-            <p class="text-xs text-text-secondary">用户总数</p>
+            <p class="text-xs text-text-secondary">Total Users</p>
           </div>
           <div class="rounded-lg bg-background p-4 text-center">
             <p id="stat-feeds" class="text-2xl font-bold text-accent">--</p>
-            <p class="text-xs text-text-secondary">RSS 源</p>
+            <p class="text-xs text-text-secondary">RSS Feeds</p>
           </div>
           <div class="rounded-lg bg-background p-4 text-center">
             <p id="stat-categories" class="text-2xl font-bold text-accent">--</p>
-            <p class="text-xs text-text-secondary">分类数</p>
+            <p class="text-xs text-text-secondary">Categories</p>
           </div>
         </div>
       </div>
 
-      {/* 快捷操作 */}
+      {/* Quick Actions */}
       <div class="rounded-xl border border-border bg-card p-6">
-        <h2 class="mb-4 text-lg font-semibold text-text-primary">快捷操作</h2>
+        <h2 class="mb-4 text-lg font-semibold text-text-primary">Quick Actions</h2>
         <div class="space-y-2">
           <a
-            href="/admin/articles/new"
+            href="/en/admin/articles/new"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -149,10 +155,10 @@ for (const row of settingsRows) {
                 stroke-width="2"
                 d="M12 4v16m8-8H4"></path></svg
             >
-            发布新文章
+            Publish New Article
           </a>
           <a
-            href="/admin/feeds"
+            href="/en/admin/feeds"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -162,10 +168,10 @@ for (const row of settingsRows) {
                 stroke-width="2"
                 d="M12 4v16m8-8H4"></path></svg
             >
-            管理 RSS 源
+            Manage RSS Feeds
           </a>
           <a
-            href="/"
+            href="/en/"
             target="_blank"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
           >
@@ -177,7 +183,7 @@ for (const row of settingsRows) {
                 d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
               ></path></svg
             >
-            查看前台
+            View Frontend
           </a>
         </div>
       </div>
@@ -208,16 +214,16 @@ for (const row of settingsRows) {
       });
       const data = await res.json();
       if (res.ok) {
-        msg.textContent = '设置已保存';
+        msg.textContent = 'Settings saved';
         msg.className = 'rounded-lg bg-success/10 px-4 py-3 text-sm text-success';
       } else {
-        msg.textContent = data.error || '保存失败';
+        msg.textContent = data.error || 'Save failed';
         msg.className = 'rounded-lg bg-error/10 px-4 py-3 text-sm text-error';
       }
       msg.classList.remove('hidden');
       setTimeout(() => msg.classList.add('hidden'), 3000);
     } catch {
-      msg.textContent = '网络错误';
+      msg.textContent = 'Network error';
       msg.className = 'rounded-lg bg-error/10 px-4 py-3 text-sm text-error';
       msg.classList.remove('hidden');
     }
@@ -249,10 +255,10 @@ for (const row of settingsRows) {
         getEl('stat-categories').textContent = String(d.categories?.length || 0);
       }
 
-      getEl('db-status').textContent = '正常';
+      getEl('db-status').textContent = 'Healthy';
       getEl('db-status').className = 'text-success';
     } catch {
-      getEl('db-status').textContent = '异常';
+      getEl('db-status').textContent = 'Error';
       getEl('db-status').className = 'text-error';
     }
   }

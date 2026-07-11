@@ -8,6 +8,13 @@
       "when": 1783743279022,
       "tag": "0000_huge_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1783795152813,
+      "tag": "0001_minor_the_leader",
+      "breakpoints": true
     }
   ]
 }

@@ -169,7 +169,7 @@ const isNew = id === 'new';
   </div>
 </AdminLayout>
 
-<script define:vars={{ id, isNew }}>
+<script is:inline define:vars={{ id, isNew }}>
   let articleId = isNew ? null : id;
 
   async function loadCategories() {

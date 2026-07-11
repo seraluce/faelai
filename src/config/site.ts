@@ -3,10 +3,10 @@
 
 export const siteConfig = {
   name: 'FaelAI',
-  title: 'AI 新闻聚合',
-  titleEn: 'AI News Aggregator',
-  description: '实时追踪人工智能领域最新动态',
-  descriptionEn: 'Track the latest developments in artificial intelligence',
+  title: 'AI 资讯与工具平台',
+  titleEn: 'AI News & Tools Platform',
+  description: '聚合全球 AI 新闻资讯，追踪人工智能领域最新动态。未来将支持 API Key 购买、AI 工具部署等更多功能。',
+  descriptionEn: 'Aggregating global AI news and tracking the latest developments in artificial intelligence. Future features include API key sales, AI tool deployment, and more.',
   url: import.meta.env.PUBLIC_SITE_URL || 'https://faelai.com',
   locale: {
     default: 'zh',

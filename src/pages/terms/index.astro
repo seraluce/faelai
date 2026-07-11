@@ -1,0 +1,94 @@
+---
+// src/pages/terms/index.astro
+// 功能：服务条款页面（中文）
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('terms.title')}>
+  <div class="mx-auto max-w-4xl px-4 py-12">
+    <h1 class="mb-8 text-3xl font-bold text-text-primary">{t('terms.title')}</h1>
+    <p class="mb-8 text-text-secondary">最后更新日期：2026年7月11日</p>
+
+    <div class="space-y-6">
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">1. 服务说明</h2>
+        <p class="text-text-secondary">
+          FaelAI 是一个 AI 新闻聚合与发布平台，旨在实时追踪人工智能领域的最新动态。我们通过 RSS
+          订阅源收集和整理来自各方面的 AI
+          相关新闻，并以结构化的方式呈现给用户。我们保留随时修改、暂停或终止服务的权利。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">2. 用户义务</h2>
+        <p class="mb-3 text-text-secondary">使用本平台时，您同意：</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>提供真实、准确的注册信息</li>
+          <li>妥善保管账户凭证，对账户下的所有活动负责</li>
+          <li>不利用平台从事任何违法或未经授权的活动</li>
+          <li>不尝试绕过平台的安全措施或访问控制</li>
+          <li>发现安全漏洞时及时向我们报告</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">3. 内容政策</h2>
+        <p class="mb-3 text-text-secondary">以下行为在本平台上被严格禁止：</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>发布违法、有害、威胁、侮辱、诽谤、色情或其他不当内容</li>
+          <li>侵犯他人知识产权或其他合法权益</li>
+          <li>冒充他人或虚假陈述与任何个人或组织的关系</li>
+          <li>分发垃圾信息、恶意软件或进行钓鱼活动</li>
+          <li>未经授权收集其他用户的个人信息</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">4. 知识产权</h2>
+        <p class="text-text-secondary">
+          本平台的原始内容、设计、代码和标识受版权法和国际知识产权条约保护。新闻聚合内容的版权归原作者或来源方所有。如您认为平台上的内容侵犯了您的知识产权，请通过
+          admin@faelai.com 与我们联系。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">5. 免责声明</h2>
+        <p class="text-text-secondary">
+          本平台提供的内容仅供参考和信息获取之用，不构成专业建议。我们力求内容的准确性，但不对其完整性、可靠性或时效性做出保证。对于因使用或依赖平台内容而产生的任何损失，我们不承担责任。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">6. 责任限制</h2>
+        <p class="text-text-secondary">
+          在法律允许的最大范围内，FaelAI
+          及其相关人员不对因使用本平台而产生的任何间接、偶然、特殊或后果性损害承担责任，包括但不限于利润损失、数据丢失或业务中断。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">7. 服务终止</h2>
+        <p class="text-text-secondary">
+          我们保留随时暂停或终止您访问平台的权利，恕不另行通知，包括但不限于违反本条款的情况。您也可以随时终止账户。服务终止后，我们可能保留部分数据以遵守法律义务。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">8. 适用法律</h2>
+        <p class="text-text-secondary">
+          本条款受中华人民共和国法律管辖。因本条款引起的或与之相关的任何争议，应提交至有管辖权的人民法院解决。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">9. 联系我们</h2>
+        <p class="text-text-secondary">如您对本服务条款有任何疑问，请通过以下方式联系我们：</p>
+        <p class="mt-2 text-text-secondary">电子邮箱：admin@faelai.com</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

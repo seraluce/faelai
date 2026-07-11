@@ -83,16 +83,20 @@ if (!user) {
 </AdminLayout>
 
 <script>
-  const modal = document.getElementById('modal');
-  const form = document.getElementById('tag-form');
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  const modal = getEl('modal');
+  const form = getEl<HTMLFormElement>('tag-form');
   let editingId: string | null = null;
 
   function openModal(tag?: any) {
     editingId = tag?.id || null;
-    document.getElementById('modal-title').textContent = tag ? '编辑标签' : '新增标签';
-    document.getElementById('edit-id').value = tag?.id || '';
-    document.getElementById('edit-name').value = tag?.name || '';
-    document.getElementById('edit-slug').value = tag?.slug || '';
+    getEl('modal-title').textContent = tag ? '编辑标签' : '新增标签';
+    getEl<HTMLInputElement>('edit-id').value = tag?.id || '';
+    getEl<HTMLInputElement>('edit-name').value = tag?.name || '';
+    getEl<HTMLInputElement>('edit-slug').value = tag?.slug || '';
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
@@ -106,7 +110,7 @@ if (!user) {
     try {
       const res = await fetch('/api/tags');
       const data = await res.json();
-      const list = document.getElementById('tag-list');
+      const list = getEl('tag-list');
 
       if (!data.tags || data.tags.length === 0) {
         list.innerHTML = `<div class="p-8 text-center text-text-tertiary">暂无标签</div>`;
@@ -115,7 +119,7 @@ if (!user) {
 
       list.innerHTML = data.tags
         .map(
-          (tag) => `
+          (tag: any) => `
         <div class="flex items-center justify-between px-4 py-3 hover:bg-background-hover">
           <div class="flex items-center gap-3">
             <svg class="h-4 w-4 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" /></svg>
@@ -138,7 +142,9 @@ if (!user) {
         .join('');
 
       list.querySelectorAll('.edit-btn').forEach((btn) => {
-        btn.addEventListener('click', () => openModal(JSON.parse(btn.dataset.edit)));
+        btn.addEventListener('click', () =>
+          openModal(JSON.parse((btn as HTMLElement).dataset.edit!))
+        );
       });
 
       list.querySelectorAll('.delete-btn').forEach((btn) => {
@@ -147,19 +153,18 @@ if (!user) {
           await fetch('/api/tags', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: btn.dataset.delete }),
+            body: JSON.stringify({ id: (btn as HTMLElement).dataset.delete }),
           });
           loadTags();
         });
       });
     } catch {
-      document.getElementById('tag-list').innerHTML =
-        `<div class="p-8 text-center text-error">加载失败</div>`;
+      getEl('tag-list').innerHTML = `<div class="p-8 text-center text-error">加载失败</div>`;
     }
   }
 
-  document.getElementById('btn-add')?.addEventListener('click', () => openModal());
-  document.getElementById('btn-cancel')?.addEventListener('click', closeModal);
+  getEl('btn-add')?.addEventListener('click', () => openModal());
+  getEl('btn-cancel')?.addEventListener('click', closeModal);
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
   });
@@ -168,8 +173,8 @@ if (!user) {
     e.preventDefault();
     const body = {
       id: editingId || undefined,
-      name: document.getElementById('edit-name').value,
-      slug: document.getElementById('edit-slug').value,
+      name: getEl<HTMLInputElement>('edit-name').value,
+      slug: getEl<HTMLInputElement>('edit-slug').value,
     };
     const method = editingId ? 'PUT' : 'POST';
     const res = await fetch('/api/tags', {

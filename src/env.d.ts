@@ -29,11 +29,9 @@ interface Env {
   GISCUS_CATEGORY_ID: string;
 }
 
-interface Locals {
-  user: import('./lib/db/schema').User | null;
-  session: import('./lib/db/schema').Session | null;
-}
-
 declare namespace App {
-  interface Locals extends Locals {}
+  interface Locals {
+    user: import('./lib/db/schema').User | null;
+    session: import('./lib/db/schema').Session | null;
+  }
 }

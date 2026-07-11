@@ -1,0 +1,244 @@
+---
+// src/pages/en/dashboard/settings/index.astro
+// 功能：账号设置页面（英文） — 个人资料编辑、密码修改
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(getLocalizedPath('/login', lang));
+}
+---
+
+<BaseLayout title={t('dashboard.settings.title')}>
+  <div class="mx-auto max-w-5xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('dashboard.settings.title')}</h1>
+      <p class="mt-1 text-text-secondary">Manage your account information and security</p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      {/* Profile Settings */}
+      <div class="rounded-xl border border-border bg-card p-6">
+        <h2 class="mb-6 text-lg font-semibold text-text-primary">Profile</h2>
+        <form id="profile-form" class="space-y-4">
+          <div>
+            <label for="full-name" class="mb-1 block text-sm font-medium text-text-secondary">
+              {t('dashboard.settings.fullName')}
+            </label>
+            <input
+              type="text"
+              id="full-name"
+              name="fullName"
+              value={user.fullName || ''}
+              required
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder-text-tertiary transition-colors focus:border-accent focus:outline-none"
+            />
+          </div>
+          <div>
+            <label for="username" class="mb-1 block text-sm font-medium text-text-secondary">
+              {t('dashboard.settings.username')}
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={user.username}
+              required
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder-text-tertiary transition-colors focus:border-accent focus:outline-none"
+            />
+          </div>
+          <div>
+            <label for="email" class="mb-1 block text-sm font-medium text-text-secondary">
+              {t('dashboard.settings.email')}
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={user.email}
+              readonly
+              class="w-full cursor-not-allowed rounded-lg border border-border bg-background px-4 py-3 text-text-tertiary"
+            />
+          </div>
+          <div
+            id="profile-error"
+            class="hidden rounded-lg bg-error/10 px-4 py-3 text-sm text-error"
+          >
+          </div>
+          <div
+            id="profile-success"
+            class="hidden rounded-lg bg-success/10 px-4 py-3 text-sm text-success"
+          >
+          </div>
+          <button
+            type="submit"
+            class="rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+          >
+            {t('dashboard.settings.save')}
+          </button>
+        </form>
+      </div>
+
+      {/* Password Settings */}
+      <div class="rounded-xl border border-border bg-card p-6">
+        <h2 class="mb-6 text-lg font-semibold text-text-primary">Password</h2>
+        <form id="password-form" class="space-y-4">
+          <div>
+            <label
+              for="current-password"
+              class="mb-1 block text-sm font-medium text-text-secondary"
+            >
+              {t('dashboard.settings.currentPassword')}
+            </label>
+            <input
+              type="password"
+              id="current-password"
+              name="currentPassword"
+              required
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder-text-tertiary transition-colors focus:border-accent focus:outline-none"
+            />
+          </div>
+          <div>
+            <label for="new-password" class="mb-1 block text-sm font-medium text-text-secondary">
+              {t('dashboard.settings.newPassword')}
+            </label>
+            <input
+              type="password"
+              id="new-password"
+              name="newPassword"
+              required
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder-text-tertiary transition-colors focus:border-accent focus:outline-none"
+            />
+          </div>
+          <div>
+            <label
+              for="confirm-password"
+              class="mb-1 block text-sm font-medium text-text-secondary"
+            >
+              {t('dashboard.settings.confirmPassword')}
+            </label>
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirmPassword"
+              required
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder-text-tertiary transition-colors focus:border-accent focus:outline-none"
+            />
+          </div>
+          <div
+            id="password-error"
+            class="hidden rounded-lg bg-error/10 px-4 py-3 text-sm text-error"
+          >
+          </div>
+          <div
+            id="password-success"
+            class="hidden rounded-lg bg-success/10 px-4 py-3 text-sm text-success"
+          >
+          </div>
+          <button
+            type="submit"
+            class="rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+          >
+            {t('dashboard.settings.save')}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  function showError(id: string, msg: string) {
+    const el = getEl(id);
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function hideError(id: string) {
+    getEl(id).classList.add('hidden');
+  }
+
+  function showSuccess(id: string, msg: string) {
+    const el = getEl(id);
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function hideSuccess(id: string) {
+    getEl(id).classList.add('hidden');
+  }
+
+  // Profile form
+  getEl('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError('profile-error');
+    hideSuccess('profile-success');
+
+    const fullName = getEl<HTMLInputElement>('full-name').value.trim();
+    const username = getEl<HTMLInputElement>('username').value.trim();
+
+    try {
+      const res = await fetch('/api/auth/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, username }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showSuccess('profile-success', data.message || 'Profile updated successfully');
+      } else {
+        showError('profile-error', data.message || 'Update failed, please try again');
+      }
+    } catch {
+      showError('profile-error', 'Network error, please try again');
+    }
+  });
+
+  // Password form
+  getEl('password-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError('password-error');
+    hideSuccess('password-success');
+
+    const currentPassword = getEl<HTMLInputElement>('current-password').value;
+    const newPassword = getEl<HTMLInputElement>('new-password').value;
+    const confirmPassword = getEl<HTMLInputElement>('confirm-password').value;
+
+    if (newPassword !== confirmPassword) {
+      showError('password-error', 'Passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      showError('password-error', 'New password must be at least 6 characters');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showSuccess('password-success', data.message || 'Password updated successfully');
+        getEl<HTMLInputElement>('current-password').value = '';
+        getEl<HTMLInputElement>('new-password').value = '';
+        getEl<HTMLInputElement>('confirm-password').value = '';
+      } else {
+        showError('password-error', data.message || 'Update failed, please try again');
+      }
+    } catch {
+      showError('password-error', 'Network error, please try again');
+    }
+  });
+</script>

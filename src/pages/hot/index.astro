@@ -2,7 +2,6 @@
 // src/pages/hot/index.astro
 // 功能：热门话题页面（中文） — 话题网格、按热度排序
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import NewsCard from '@/components/news/NewsCard.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);

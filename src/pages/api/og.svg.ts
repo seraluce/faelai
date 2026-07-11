@@ -31,7 +31,6 @@ function wrapText(text: string, maxChars: number): string[] {
 export const GET: APIRoute = ({ url }) => {
   const title = url.searchParams.get('title') || siteConfig.title;
   const subtitle = url.searchParams.get('subtitle') || siteConfig.description;
-  const lang = url.searchParams.get('lang') || 'zh';
   const color = url.searchParams.get('color') || '#0070f3';
 
   const titleLines = wrapText(title, 18);

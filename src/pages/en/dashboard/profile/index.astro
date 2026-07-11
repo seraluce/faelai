@@ -1,0 +1,224 @@
+---
+// src/pages/en/dashboard/profile/index.astro
+// 功能：用户个人页面（英文） -- 头像、个人信息展示
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(getLocalizedPath('/login', lang));
+}
+---
+
+<BaseLayout title={t('dashboard.profile')}>
+  <div class="mx-auto max-w-3xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('dashboard.profile')}</h1>
+      <p class="mt-1 text-text-secondary">Manage your personal information and avatar</p>
+    </div>
+
+    <div class="rounded-xl border border-border bg-card p-6">
+      <div class="mb-6 flex items-center gap-6">
+        <div class="group relative">
+          <img
+            id="avatar-preview"
+            src={user.avatarUrl || ''}
+            alt={user.username}
+            class="h-24 w-24 rounded-full object-cover bg-background"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div
+            id="avatar-placeholder"
+            class="h-24 w-24 items-center justify-center rounded-full bg-accent/10 text-2xl font-bold text-accent"
+            style={user.avatarUrl ? 'display:none;' : 'display:flex;'}
+          >
+            {(user.fullName || user.username || '').charAt(0).toUpperCase()}
+          </div>
+          <label
+            for="avatar-input"
+            class="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-white"
+            >
+              <path
+                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+              ></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </label>
+          <input
+            type="file"
+            id="avatar-input"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            class="hidden"
+          />
+        </div>
+
+        <div>
+          <h2 class="text-lg font-semibold text-text-primary">{user.fullName || user.username}</h2>
+          <p class="text-sm text-text-secondary">@{user.username}</p>
+          <div id="avatar-status" class="mt-1 text-xs text-text-tertiary">
+            JPG, PNG, WebP, GIF supported, max 5MB
+          </div>
+        </div>
+      </div>
+
+      <div id="error-message" class="hidden rounded-lg bg-error/10 px-4 py-3 text-sm text-error">
+      </div>
+      <div
+        id="success-message"
+        class="hidden rounded-lg bg-success/10 px-4 py-3 text-sm text-success"
+      >
+      </div>
+
+      <div class="border-t border-border pt-6">
+        <h3 class="mb-4 text-sm font-medium text-text-secondary">Personal Information</h3>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Username</label>
+            <div
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary"
+            >
+              {user.username}
+            </div>
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Email</label>
+            <div
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary"
+            >
+              {user.email}
+            </div>
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Role</label>
+            <div
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary capitalize"
+            >
+              {user.role}
+            </div>
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Registered</label>
+            <div
+              class="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary"
+            >
+              {
+                user.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  : '-'
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  function showError(msg: string) {
+    const el = getEl('error-message');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function hideError() {
+    getEl('error-message').classList.add('hidden');
+  }
+
+  function showSuccess(msg: string) {
+    const el = getEl('success-message');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function hideSuccess() {
+    getEl('success-message').classList.add('hidden');
+  }
+
+  getEl('avatar-input').addEventListener('change', async (e) => {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    hideError();
+    hideSuccess();
+
+    if (file.size > 5 * 1024 * 1024) {
+      showError('File size must be under 5MB');
+      input.value = '';
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      showError('Only JPG, PNG, WebP, GIF formats are supported');
+      input.value = '';
+      return;
+    }
+
+    const preview = getEl<HTMLImageElement>('avatar-preview');
+    const placeholder = getEl<HTMLDivElement>('avatar-placeholder');
+    const status = getEl<HTMLDivElement>('avatar-status');
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      preview.src = reader.result as string;
+      preview.style.display = 'block';
+      placeholder.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+
+    status.textContent = 'Uploading...';
+    status.classList.add('text-accent');
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const res = await fetch('/api/auth/upload-avatar', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        showSuccess('Avatar uploaded successfully');
+        status.textContent = 'JPG, PNG, WebP, GIF supported, max 5MB';
+        status.classList.remove('text-accent');
+      } else {
+        showError(data.error || 'Upload failed, please try again');
+        status.textContent = 'JPG, PNG, WebP, GIF supported, max 5MB';
+        status.classList.remove('text-accent');
+      }
+    } catch {
+      showError('Network error, please try again');
+      status.textContent = 'JPG, PNG, WebP, GIF supported, max 5MB';
+      status.classList.remove('text-accent');
+    }
+
+    input.value = '';
+  });
+</script>

@@ -1,0 +1,94 @@
+---
+// src/pages/verify-email/index.astro
+// 功能：邮箱验证回调页面（中文） — 通过 token 验证邮箱
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const loginPath = getLocalizedPath('/login', lang);
+---
+
+<BaseLayout title={t('verifyEmail.title')}>
+  <div
+    class="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md items-center justify-center px-4 py-12"
+  >
+    <div class="w-full text-center">
+      <div id="verifying" class="space-y-4">
+        <div
+          class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-accent border-t-transparent"
+        >
+        </div>
+        <p class="text-text-secondary">正在验证...</p>
+      </div>
+
+      <div id="success-message" class="hidden space-y-4">
+        <p class="text-lg font-medium text-success">邮箱验证成功</p>
+        <p class="text-sm text-text-secondary">你的邮箱已成功验证，现在可以登录了。</p>
+        <a
+          href={loginPath}
+          class="inline-block rounded-lg bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent-hover"
+        >
+          {t('auth.login.title')}
+        </a>
+      </div>
+
+      <div id="error-message" class="hidden space-y-4">
+        <p class="text-lg font-medium text-error">验证失败</p>
+        <p id="error-text" class="text-sm text-text-secondary"></p>
+        <a
+          href={loginPath}
+          class="inline-block rounded-lg bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent-hover"
+        >
+          {t('auth.login.title')}
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const verifying = document.getElementById('verifying');
+  const successMessage = document.getElementById('success-message');
+  const errorMessage = document.getElementById('error-message');
+  const errorText = document.getElementById('error-text');
+
+  async function verifyEmail() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (!token) {
+      verifying?.classList.add('hidden');
+      errorMessage?.classList.remove('hidden');
+      if (errorText) errorText.textContent = '缺少验证令牌';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await res.json();
+
+      verifying?.classList.add('hidden');
+
+      if (!res.ok) {
+        errorMessage?.classList.remove('hidden');
+        if (errorText) errorText.textContent = data.error || '验证失败';
+        return;
+      }
+
+      successMessage?.classList.remove('hidden');
+    } catch {
+      verifying?.classList.add('hidden');
+      errorMessage?.classList.remove('hidden');
+      if (errorText) errorText.textContent = '网络错误，请稍后重试';
+    }
+  }
+
+  verifyEmail();
+</script>

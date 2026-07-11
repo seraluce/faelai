@@ -1,0 +1,101 @@
+---
+// src/pages/dashboard/likes/index.astro
+// 功能：我的点赞页面（中文） — 展示用户点赞的文章列表
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(getLocalizedPath('/login', lang));
+}
+---
+
+<BaseLayout title={t('dashboard.likes.title')}>
+  <div class="mx-auto max-w-5xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('dashboard.likes.title')}</h1>
+      <p class="mt-1 text-text-secondary">管理你点赞的文章</p>
+    </div>
+
+    <div class="rounded-xl border border-border bg-card p-6">
+      <div id="likes-loading" class="py-8 text-center text-text-secondary">
+        {t('common.loading')}
+      </div>
+
+      <div id="likes-empty" class="hidden py-8 text-center text-text-secondary">
+        <svg
+          class="mx-auto mb-4 h-12 w-12 text-text-tertiary"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          ></path>
+        </svg>
+        <p>{t('dashboard.likes.empty')}</p>
+      </div>
+
+      <div id="likes-list" class="hidden divide-y divide-border"></div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  interface LikedArticle {
+    id: string;
+    title: string;
+    slug: string;
+    source: string;
+    createdAt: string;
+  }
+
+  async function loadLikes() {
+    const loading = getEl('likes-loading');
+    const empty = getEl('likes-empty');
+    const list = getEl('likes-list');
+
+    try {
+      const res = await fetch('/api/user/likes');
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data: LikedArticle[] = await res.json();
+
+      loading.classList.add('hidden');
+
+      if (!data || data.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      list.innerHTML = data
+        .map(
+          (item) => `
+          <a href="/news/${item.slug}" class="flex items-center justify-between px-4 py-3 transition-colors hover:bg-background-hover">
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium text-text-primary">${item.title}</p>
+              <p class="mt-0.5 text-xs text-text-tertiary">${item.source || ''}</p>
+            </div>
+            <span class="ml-4 shrink-0 text-xs text-text-tertiary">${new Date(item.createdAt).toLocaleDateString('zh-CN')}</span>
+          </a>`
+        )
+        .join('');
+
+      list.classList.remove('hidden');
+    } catch {
+      loading.classList.add('hidden');
+      empty.classList.remove('hidden');
+    }
+  }
+
+  loadLikes();
+</script>

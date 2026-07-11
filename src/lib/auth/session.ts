@@ -3,7 +3,7 @@
 import { db, schema } from '@/lib/db';
 import { eq, and, gt } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase32, decodeBase32 } from '@oslojs/encoding';
+import { encodeBase32NoPadding } from '@oslojs/encoding';
 
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const SESSION_COOKIE_NAME = 'session';
@@ -11,7 +11,7 @@ const SESSION_COOKIE_NAME = 'session';
 export function generateSessionToken(): string {
   const bytes = new Uint8Array(20);
   crypto.getRandomValues(bytes);
-  return encodeBase32(bytes, { padded: false });
+  return encodeBase32NoPadding(bytes);
 }
 
 export function hashSessionToken(token: string): string {

@@ -1,0 +1,81 @@
+---
+// src/pages/en/disclaimer/index.astro
+// 功能：免责声明页面（英文）
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('disclaimer.title')}>
+  <div class="mx-auto max-w-4xl px-4 py-12">
+    <h1 class="mb-8 text-3xl font-bold text-text-primary">{t('disclaimer.title')}</h1>
+    <p class="mb-8 text-text-secondary">Last updated: July 11, 2026</p>
+
+    <div class="space-y-6">
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">1. Information Accuracy</h2>
+        <p class="text-text-secondary">
+          FaelAI is committed to providing accurate and timely AI news and information. However, all
+          content displayed on the platform originates from third-party RSS feed sources, and we
+          make no warranty, express or implied, regarding the accuracy, completeness, or timeliness
+          of this content. Users should independently verify the accuracy of information before
+          making any decisions.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">2. External Links</h2>
+        <p class="text-text-secondary">
+          This platform may contain links to third-party websites. These links are provided solely
+          for user convenience and do not imply our endorsement or recommendation of linked content.
+          We have no control over the content or privacy practices of third-party websites, and
+          users assume all risks when accessing external links.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">3. RSS Content Attribution</h2>
+        <p class="text-text-secondary">
+          This platform aggregates news content from various sources through RSS feeds. The
+          copyright of all articles belongs to their original authors or publishing platforms.
+          FaelAI serves only as a content aggregation and distribution platform and does not own the
+          copyright to this content. If you are a content creator and believe our use of your
+          content is problematic, please contact admin@faelai.com.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">
+          4. Professional Advice Disclaimer
+        </h2>
+        <p class="text-text-secondary">
+          All content provided on this platform is for reference and informational purposes only and
+          does not constitute professional advice of any kind, including but not limited to legal,
+          financial, investment, or technical advice. Users should not use platform content as a
+          substitute for professional consultation and should instead consult professionals in the
+          relevant fields.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">5. Limitation of Liability</h2>
+        <p class="text-text-secondary">
+          To the maximum extent permitted by law, FaelAI and its operators shall not be liable for
+          any direct, indirect, incidental, special, or consequential damages arising from the use
+          of or inability to use this platform. By using this platform, you acknowledge and agree to
+          all terms of this disclaimer.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">6. Contact Us</h2>
+        <p class="text-text-secondary">
+          If you have any questions about this disclaimer, please contact us at:
+        </p>
+        <p class="mt-2 text-text-secondary">Email: admin@faelai.com</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

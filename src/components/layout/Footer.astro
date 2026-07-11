@@ -164,7 +164,7 @@ function getLabel(item: { zh?: string; en?: string }): string {
       <div class="flex flex-wrap items-center justify-center gap-4 text-xs text-text-tertiary">
         <span>&copy; {year} {siteConfig.copyright.holder}. {t('footer.copyright')}</span>
         {
-          siteConfig.protocols.map((proto, i) => (
+          siteConfig.protocols.map((proto, _i) => (
             <>
               <span class="hidden sm:inline">·</span>
               <a

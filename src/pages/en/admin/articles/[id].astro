@@ -1,0 +1,280 @@
+---
+// src/pages/en/admin/articles/[id].astro
+// 功能：文章编辑页面（英文） — 创建/编辑文章、标题、内容、分类、标签、封面图上传
+import AdminLayout from '@/layouts/AdminLayout.astro';
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const { id } = Astro.params;
+const isNew = id === 'new';
+---
+
+<AdminLayout>
+  <div class="px-4 py-8 md:px-8">
+    <div class="mb-8 flex items-center gap-4">
+      <a
+        href="/admin/articles"
+        class="rounded-lg p-2 text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          ><path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg
+        >
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-text-primary">
+          {isNew ? 'New Article' : 'Edit Article'}
+        </h1>
+        <p class="mt-1 text-text-secondary">
+          {isNew ? 'Create new article content' : 'Modify article content and settings'}
+        </p>
+      </div>
+    </div>
+
+    <form id="article-form" class="grid gap-6 lg:grid-cols-3">
+      {/* Main content area */}
+      <div class="space-y-6 lg:col-span-2">
+        <div class="rounded-xl border border-border bg-card p-6">
+          <label for="title" class="mb-2 block text-sm font-medium text-text-primary">Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            placeholder="Enter article title..."
+            class="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          />
+        </div>
+
+        <div class="rounded-xl border border-border bg-card p-6">
+          <label for="content" class="mb-2 block text-sm font-medium text-text-primary"
+            >Content</label
+          >
+          <textarea
+            id="content"
+            name="content"
+            rows="20"
+            placeholder="Enter article content (HTML supported)..."
+            class="w-full rounded-lg border border-border bg-background px-4 py-2.5 font-mono text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          ></textarea>
+        </div>
+
+        <div class="rounded-xl border border-border bg-card p-6">
+          <label for="excerpt" class="mb-2 block text-sm font-medium text-text-primary"
+            >Excerpt</label
+          >
+          <textarea
+            id="excerpt"
+            name="excerpt"
+            rows="3"
+            placeholder="Brief article summary..."
+            class="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          ></textarea>
+        </div>
+      </div>
+
+      {/* Sidebar */}
+      <div class="space-y-6">
+        {/* Publish settings */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-4 text-sm font-medium text-text-primary">Publish Settings</h3>
+          <div class="space-y-4">
+            <div>
+              <label for="status" class="mb-1 block text-xs text-text-secondary">Status</label>
+              <select
+                id="status"
+                name="status"
+                class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              >
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+            <div>
+              <label for="category" class="mb-1 block text-xs text-text-secondary">Category</label>
+              <select
+                id="category"
+                name="categoryId"
+                class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              >
+                <option value="">No category</option>
+              </select>
+            </div>
+            <div>
+              <label for="lang" class="mb-1 block text-xs text-text-secondary">Language</label>
+              <select
+                id="lang"
+                name="lang"
+                class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              >
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div>
+              <label for="coverImage" class="mb-1 block text-xs text-text-secondary"
+                >Cover Image URL</label
+              >
+              <input
+                type="url"
+                id="coverImage"
+                name="coverImage"
+                placeholder="https://..."
+                class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <div class="space-y-2">
+            <button
+              type="submit"
+              id="btn-save"
+              class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            >
+              {isNew ? 'Save Draft' : 'Save Changes'}
+            </button>
+            <button
+              type="button"
+              id="btn-publish"
+              class="w-full rounded-lg border border-accent px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent/10"
+            >
+              Publish Now
+            </button>
+            {
+              !isNew && (
+                <button
+                  type="button"
+                  id="btn-delete"
+                  class="w-full rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:border-error hover:text-error"
+                >
+                  Delete Article
+                </button>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</AdminLayout>
+
+<script define:vars={{ id, isNew }}>
+  let articleId = isNew ? null : id;
+
+  async function loadCategories() {
+    try {
+      const res = await fetch('/api/categories');
+      if (res.ok) {
+        const data = await res.json();
+        const select = document.getElementById('category');
+        data.categories?.forEach((c) => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.name;
+          select.appendChild(opt);
+        });
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  async function loadArticle() {
+    if (isNew || !articleId) return;
+    try {
+      const res = await fetch(`/api/articles/${articleId}`);
+      const data = await res.json();
+      const a = data.article;
+      document.getElementById('title').value = a.title || '';
+      document.getElementById('content').value = a.content || '';
+      document.getElementById('excerpt').value = a.excerpt || '';
+      document.getElementById('status').value = a.status || 'draft';
+      document.getElementById('lang').value = a.lang || 'zh';
+      document.getElementById('coverImage').value = a.coverImage || '';
+      if (a.categoryId) document.getElementById('category').value = a.categoryId;
+    } catch {
+      alert('Failed to load article');
+    }
+  }
+
+  async function saveArticle(statusOverride) {
+    const title = document.getElementById('title').value.trim();
+    if (!title) {
+      alert('Title cannot be empty');
+      return;
+    }
+
+    const body = {
+      title,
+      content: document.getElementById('content').value,
+      excerpt: document.getElementById('excerpt').value,
+      categoryId: document.getElementById('category').value || undefined,
+      lang: document.getElementById('lang').value,
+      status: statusOverride || document.getElementById('status').value,
+      coverImage: document.getElementById('coverImage').value || undefined,
+    };
+
+    try {
+      let res;
+      if (isNew) {
+        res = await fetch('/api/articles/slug', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      } else {
+        body.id = articleId;
+        res = await fetch('/api/articles/slug', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      }
+      const data = await res.json();
+      if (data.success) {
+        if (isNew && data.id) articleId = data.id;
+        alert('Saved successfully');
+        if (!isNew) loadArticle();
+      } else {
+        alert(data.error || 'Save failed');
+      }
+    } catch {
+      alert('Save failed');
+    }
+  }
+
+  document.getElementById('article-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveArticle();
+  });
+  document.getElementById('btn-publish')?.addEventListener('click', () => saveArticle('published'));
+  document.getElementById('btn-delete')?.addEventListener('click', async () => {
+    if (!confirm('Delete this article?')) return;
+    try {
+      const res = await fetch('/api/articles/slug', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: articleId }),
+      });
+      const data = await res.json();
+      if (data.success) window.location.href = '/admin/articles';
+      else alert(data.error || 'Delete failed');
+    } catch {
+      alert('Delete failed');
+    }
+  });
+
+  loadCategories();
+  loadArticle();
+</script>

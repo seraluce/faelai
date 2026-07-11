@@ -1,0 +1,64 @@
+---
+// src/pages/disclaimer/index.astro
+// 功能：免责声明页面（中文）
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('disclaimer.title')}>
+  <div class="mx-auto max-w-4xl px-4 py-12">
+    <h1 class="mb-8 text-3xl font-bold text-text-primary">{t('disclaimer.title')}</h1>
+    <p class="mb-8 text-text-secondary">最后更新日期：2026年7月11日</p>
+
+    <div class="space-y-6">
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">1. 信息准确性</h2>
+        <p class="text-text-secondary">
+          FaelAI 致力于提供准确、及时的 AI 领域新闻和信息。但平台上展示的所有内容均来自第三方 RSS
+          订阅源，我们不对这些内容的准确性、完整性或时效性做出任何形式的保证。用户在做出任何决策前，应自行验证信息的准确性。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">2. 外部链接</h2>
+        <p class="text-text-secondary">
+          本平台可能包含指向第三方网站的链接。这些链接仅为方便用户而提供，并不意味着我们对链接内容的认可或推荐。我们无法控制第三方网站的内容或隐私做法，访问外部链接的风险由用户自行承担。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">3. RSS 内容归属</h2>
+        <p class="text-text-secondary">
+          本平台通过 RSS
+          订阅源聚合来自各方的新闻内容。所有文章的版权归原始作者或发布平台所有。FaelAI
+          仅作为内容聚合和分发平台，不拥有这些内容的版权。如您是内容创作者并认为我们的使用方式存在问题，请联系
+          admin@faelai.com。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">4. 专业建议免责声明</h2>
+        <p class="text-text-secondary">
+          本平台提供的所有内容仅供参考和信息获取之用，不构成任何形式的专业建议，包括但不限于法律、财务、投资或技术建议。用户不应将平台内容作为专业咨询的替代品，而应咨询相关领域的专业人士。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">5. 责任限制</h2>
+        <p class="text-text-secondary">
+          在法律允许的最大范围内，FaelAI
+          及其运营者不对因使用或无法使用本平台而产生的任何直接、间接、偶然、特殊或后果性损害承担责任。使用本平台即表示您理解并同意本免责声明的所有条款。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">6. 联系我们</h2>
+        <p class="text-text-secondary">如您对本免责声明有任何疑问，请通过以下方式联系我们：</p>
+        <p class="mt-2 text-text-secondary">电子邮箱：admin@faelai.com</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

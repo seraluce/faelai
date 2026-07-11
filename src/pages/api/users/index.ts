@@ -34,13 +34,13 @@ export const GET: APIRoute = async ({ url, locals }) => {
       .limit(limit)
       .offset(offset);
 
-    const countResult = await db.select({ count: sql`count(*)` }).from(schema.users);
+    const countResult = await db.select({ count: sql<number>`count(*)` }).from(schema.users);
     const total = countResult[0]?.count || 0;
 
     return new Response(
       JSON.stringify({
         users,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+        pagination: { page, limit, total, totalPages: Math.ceil(Number(total) / limit) },
       }),
       {
         status: 200,

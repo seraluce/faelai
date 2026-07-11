@@ -141,6 +141,10 @@ if (!user) {
 </AdminLayout>
 
 <script>
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
   async function loadStats() {
     try {
       const [articlesRes, usersRes, feedsRes, categoriesRes] = await Promise.all([
@@ -152,26 +156,26 @@ if (!user) {
 
       if (articlesRes.ok) {
         const d = await articlesRes.json();
-        document.getElementById('stat-articles').textContent = d.pagination?.total || 0;
+        getEl('stat-articles').textContent = String(d.pagination?.total || 0);
       }
       if (usersRes.ok) {
         const d = await usersRes.json();
-        document.getElementById('stat-users').textContent = d.pagination?.total || 0;
+        getEl('stat-users').textContent = String(d.pagination?.total || 0);
       }
       if (feedsRes.ok) {
         const d = await feedsRes.json();
-        document.getElementById('stat-feeds').textContent = d.feeds?.length || 0;
+        getEl('stat-feeds').textContent = String(d.feeds?.length || 0);
       }
       if (categoriesRes.ok) {
         const d = await categoriesRes.json();
-        document.getElementById('stat-categories').textContent = d.categories?.length || 0;
+        getEl('stat-categories').textContent = String(d.categories?.length || 0);
       }
 
-      document.getElementById('db-status').textContent = '正常';
-      document.getElementById('db-status').className = 'text-success';
+      getEl('db-status').textContent = '正常';
+      getEl('db-status').className = 'text-success';
     } catch {
-      document.getElementById('db-status').textContent = '异常';
-      document.getElementById('db-status').className = 'text-error';
+      getEl('db-status').textContent = '异常';
+      getEl('db-status').className = 'text-error';
     }
   }
 

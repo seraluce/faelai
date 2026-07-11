@@ -1,0 +1,121 @@
+---
+// src/pages/en/privacy/index.astro
+// 功能：隐私政策页面（英文）
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('privacy.title')}>
+  <div class="mx-auto max-w-4xl px-4 py-12">
+    <h1 class="mb-8 text-3xl font-bold text-text-primary">{t('privacy.title')}</h1>
+    <p class="mb-8 text-text-secondary">Last updated: July 11, 2026</p>
+
+    <div class="space-y-6">
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">1. Introduction</h2>
+        <p class="text-text-secondary">
+          Welcome to FaelAI (hereinafter referred to as "we"). We take your privacy very seriously.
+          This privacy policy explains how we collect, use, store, and protect your personal
+          information. By using our services, you agree to the data processing practices described
+          in this policy.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">2. Information Collection</h2>
+        <p class="mb-3 text-text-secondary">We may collect the following types of information:</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>
+            <strong>Account Information:</strong> Username, email address, and password (encrypted) provided
+            during registration.
+          </li>
+          <li>
+            <strong>Usage Data:</strong> Anonymized data such as page visit times, browsing behavior,
+            and search queries.
+          </li>
+          <li>
+            <strong>Device Information:</strong> Basic technical information including browser type, operating
+            system, and screen resolution.
+          </li>
+          <li>
+            <strong>Cookie Data:</strong> Small text files used to maintain session state and improve
+            user experience.
+          </li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">3. Information Use</h2>
+        <p class="mb-3 text-text-secondary">
+          We use the collected information for the following purposes:
+        </p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>To provide, maintain, and improve our services</li>
+          <li>To send account-related notifications and updates</li>
+          <li>To analyze usage trends for optimized content recommendations</li>
+          <li>To prevent fraud and ensure platform security</li>
+          <li>To comply with legal and regulatory requirements</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">4. Cookies</h2>
+        <p class="text-text-secondary">
+          We use cookies and similar technologies to maintain session states, remember your
+          preferences, and analyze service usage. You may manage or disable cookies through your
+          browser settings, but this may affect the normal use of certain features.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">5. Third-Party Services</h2>
+        <p class="text-text-secondary">
+          We may use third-party services (such as Cloudflare, GitHub, Google) to support platform
+          operations. These third-party services have their own privacy policies, and we recommend
+          reviewing them to understand their data processing practices.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">6. Data Security</h2>
+        <p class="text-text-secondary">
+          We employ industry-standard security measures to protect your personal information,
+          including data encryption, access controls, and security audits. However, please note that
+          no electronic transmission or storage method can guarantee 100% security.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">7. Your Rights</h2>
+        <p class="mb-3 text-text-secondary">You have the following rights:</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>Access and view your personal information we hold</li>
+          <li>Request correction of inaccurate personal information</li>
+          <li>Request deletion of your personal information</li>
+          <li>Withdraw consent to data processing</li>
+          <li>Export your personal data</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">8. Policy Updates</h2>
+        <p class="text-text-secondary">
+          We may update this privacy policy from time to time. Updated policies will be published on
+          this page with the "Last updated" date revised at the top. For significant changes, we
+          will notify you via email or in-platform notification.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">9. Contact Us</h2>
+        <p class="text-text-secondary">
+          If you have any questions about this privacy policy, please contact us at:
+        </p>
+        <p class="mt-2 text-text-secondary">Email: admin@faelai.com</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

@@ -125,20 +125,35 @@ if (!user) {
 </AdminLayout>
 
 <script>
-  const modal = document.getElementById('modal');
-  const form = document.getElementById('feed-form');
+  interface FeedData {
+    id?: string;
+    name?: string;
+    url?: string;
+    siteUrl?: string;
+    description?: string;
+    lang?: string;
+    fetchInterval?: number;
+    isActive?: boolean;
+  }
+
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  const modal = getEl('modal');
+  const form = getEl<HTMLFormElement>('feed-form');
   let editingId: string | null = null;
 
-  function openModal(feed?: any) {
+  function openModal(feed?: FeedData) {
     editingId = feed?.id || null;
-    document.getElementById('modal-title').textContent = feed ? '编辑 RSS 源' : '添加 RSS 源';
-    document.getElementById('edit-id').value = feed?.id || '';
-    document.getElementById('edit-name').value = feed?.name || '';
-    document.getElementById('edit-url').value = feed?.url || '';
-    document.getElementById('edit-siteUrl').value = feed?.siteUrl || '';
-    document.getElementById('edit-description').value = feed?.description || '';
-    document.getElementById('edit-lang').value = feed?.lang || 'en';
-    document.getElementById('edit-fetchInterval').value = feed?.fetchInterval || 3600;
+    getEl('modal-title').textContent = feed ? '编辑 RSS 源' : '添加 RSS 源';
+    getEl<HTMLInputElement>('edit-id').value = feed?.id || '';
+    getEl<HTMLInputElement>('edit-name').value = feed?.name || '';
+    getEl<HTMLInputElement>('edit-url').value = feed?.url || '';
+    getEl<HTMLInputElement>('edit-siteUrl').value = feed?.siteUrl || '';
+    getEl<HTMLTextAreaElement>('edit-description').value = feed?.description || '';
+    getEl<HTMLSelectElement>('edit-lang').value = feed?.lang || 'en';
+    getEl<HTMLInputElement>('edit-fetchInterval').value = String(feed?.fetchInterval || 3600);
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
@@ -152,7 +167,7 @@ if (!user) {
     try {
       const res = await fetch('/api/feeds');
       const data = await res.json();
-      const list = document.getElementById('feed-list');
+      const list = getEl('feed-list');
 
       if (!data.feeds || data.feeds.length === 0) {
         list.innerHTML = `<div class="p-8 text-center text-text-tertiary">暂无 RSS 源</div>`;
@@ -161,7 +176,7 @@ if (!user) {
 
       list.innerHTML = data.feeds
         .map(
-          (f) => `
+          (f: FeedData & { isActive: boolean }) => `
         <div class="flex items-center justify-between px-4 py-3 hover:bg-background-hover">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
@@ -193,7 +208,7 @@ if (!user) {
 
       list.querySelectorAll('.toggle-btn').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          const data = JSON.parse(btn.dataset.toggle);
+          const data = JSON.parse((btn as HTMLElement).dataset.toggle!);
           await fetch('/api/feeds', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -204,7 +219,9 @@ if (!user) {
       });
 
       list.querySelectorAll('.edit-btn').forEach((btn) => {
-        btn.addEventListener('click', () => openModal(JSON.parse(btn.dataset.edit)));
+        btn.addEventListener('click', () =>
+          openModal(JSON.parse((btn as HTMLElement).dataset.edit!))
+        );
       });
 
       list.querySelectorAll('.delete-btn').forEach((btn) => {
@@ -213,19 +230,18 @@ if (!user) {
           await fetch('/api/feeds', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: btn.dataset.delete }),
+            body: JSON.stringify({ id: (btn as HTMLElement).dataset.delete }),
           });
           loadFeeds();
         });
       });
     } catch {
-      document.getElementById('feed-list').innerHTML =
-        `<div class="p-8 text-center text-error">加载失败</div>`;
+      getEl('feed-list').innerHTML = `<div class="p-8 text-center text-error">加载失败</div>`;
     }
   }
 
-  document.getElementById('btn-add')?.addEventListener('click', () => openModal());
-  document.getElementById('btn-cancel')?.addEventListener('click', closeModal);
+  getEl('btn-add')?.addEventListener('click', () => openModal());
+  getEl('btn-cancel')?.addEventListener('click', closeModal);
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
   });
@@ -234,12 +250,12 @@ if (!user) {
     e.preventDefault();
     const body = {
       id: editingId || undefined,
-      name: document.getElementById('edit-name').value,
-      url: document.getElementById('edit-url').value,
-      siteUrl: document.getElementById('edit-siteUrl').value || undefined,
-      description: document.getElementById('edit-description').value || undefined,
-      lang: document.getElementById('edit-lang').value,
-      fetchInterval: parseInt(document.getElementById('edit-fetchInterval').value) || 3600,
+      name: getEl<HTMLInputElement>('edit-name').value,
+      url: getEl<HTMLInputElement>('edit-url').value,
+      siteUrl: getEl<HTMLInputElement>('edit-siteUrl').value || undefined,
+      description: getEl<HTMLTextAreaElement>('edit-description').value || undefined,
+      lang: getEl<HTMLSelectElement>('edit-lang').value,
+      fetchInterval: parseInt(getEl<HTMLInputElement>('edit-fetchInterval').value) || 3600,
     };
     const method = editingId ? 'PUT' : 'POST';
     const res = await fetch('/api/feeds', {

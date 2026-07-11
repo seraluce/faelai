@@ -56,7 +56,7 @@ export async function fetchRSSFeed(url: string): Promise<RSSFeed> {
     };
   } catch (error) {
     console.error(`Failed to fetch RSS feed from ${url}:`, error);
-    throw new Error(`RSS feed fetch failed: ${url}`);
+    throw new Error(`RSS feed fetch failed: ${url}`, { cause: error });
   }
 }
 

@@ -2,7 +2,7 @@
 // 功能：分类列表 API — GET 获取所有分类、POST 创建分类
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
-import { eq, asc } from 'drizzle-orm';
+import { asc } from 'drizzle-orm';
 import { generateId } from '@/lib/utils';
 
 export const GET: APIRoute = async () => {

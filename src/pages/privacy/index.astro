@@ -1,0 +1,98 @@
+---
+// src/pages/privacy/index.astro
+// 功能：隐私政策页面（中文）
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('privacy.title')}>
+  <div class="mx-auto max-w-4xl px-4 py-12">
+    <h1 class="mb-8 text-3xl font-bold text-text-primary">{t('privacy.title')}</h1>
+    <p class="mb-8 text-text-secondary">最后更新日期：2026年7月11日</p>
+
+    <div class="space-y-6">
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">1. 引言</h2>
+        <p class="text-text-secondary">
+          欢迎访问
+          FaelAI（以下简称"我们"）。我们非常重视您的隐私保护。本隐私政策旨在说明我们如何收集、使用、存储和保护您的个人信息。使用我们的服务即表示您同意本政策中描述的数据处理方式。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">2. 信息收集</h2>
+        <p class="mb-3 text-text-secondary">我们可能收集以下类型的信息：</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li><strong>账户信息：</strong>您注册时提供的用户名、电子邮箱地址和密码（加密存储）。</li>
+          <li><strong>使用数据：</strong>您访问页面的时间、浏览行为、搜索查询等匿名化数据。</li>
+          <li><strong>设备信息：</strong>浏览器类型、操作系统、屏幕分辨率等基础技术信息。</li>
+          <li><strong>Cookie 数据：</strong>用于维持会话状态和提升用户体验的小型文本文件。</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">3. 信息使用</h2>
+        <p class="mb-3 text-text-secondary">我们收集的信息将用于以下目的：</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>提供、维护和改进我们的服务</li>
+          <li>发送账户相关的通知和更新</li>
+          <li>分析使用趋势以优化内容推荐</li>
+          <li>预防欺诈和保障平台安全</li>
+          <li>遵守法律法规要求</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">4. Cookie 使用</h2>
+        <p class="text-text-secondary">
+          我们使用 Cookie
+          和类似技术来维持会话状态、记住您的偏好设置以及分析服务使用情况。您可以通过浏览器设置管理或禁用
+          Cookie，但这可能影响部分功能的正常使用。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">5. 第三方服务</h2>
+        <p class="text-text-secondary">
+          我们可能使用第三方服务（如
+          Cloudflare、GitHub、Google）来支持平台运营。这些第三方服务有其独立的隐私政策，我们建议您查阅相关政策以了解其数据处理方式。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">6. 数据安全</h2>
+        <p class="text-text-secondary">
+          我们采用行业标准的安全措施来保护您的个人信息，包括数据加密、访问控制和安全审计。然而，请注意任何电子传输或存储方式都无法保证百分之百的安全性。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">7. 用户权利</h2>
+        <p class="mb-3 text-text-secondary">您享有以下权利：</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>访问和查看我们持有的您的个人信息</li>
+          <li>要求更正不准确的个人信息</li>
+          <li>要求删除您的个人信息</li>
+          <li>撤回对数据处理的同意</li>
+          <li>导出您的个人数据</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">8. 政策更新</h2>
+        <p class="text-text-secondary">
+          我们可能会不时更新本隐私政策。更新后的政策将在本页面发布，并更新顶部的"最后更新日期"。重大变更时，我们将通过电子邮件或站内通知告知您。
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">9. 联系我们</h2>
+        <p class="text-text-secondary">如您对本隐私政策有任何疑问，请通过以下方式联系我们：</p>
+        <p class="mt-2 text-text-secondary">电子邮箱：admin@faelai.com</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

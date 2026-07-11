@@ -29,31 +29,23 @@ if (!user) {
 </AdminLayout>
 
 <script>
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
   async function loadUsers() {
     try {
       const res = await fetch('/api/users');
       const data = await res.json();
-      const list = document.getElementById('user-list');
+      const list = getEl('user-list');
 
       if (!data.users || data.users.length === 0) {
         list.innerHTML = `<div class="p-8 text-center text-text-tertiary">暂无用户</div>`;
         return;
       }
 
-      const roleColors: Record<string, string> = {
-        admin: 'bg-accent/10 text-accent',
-        editor: 'bg-warning/10 text-warning',
-        user: 'bg-text-tertiary/10 text-text-tertiary',
-      };
-
-      const roleLabels: Record<string, string> = {
-        admin: '管理员',
-        editor: '编辑',
-        user: '用户',
-      };
-
       list.innerHTML = data.users
-        .map((u) => {
+        .map((u: any) => {
           const date = new Date(u.createdAt).toLocaleDateString('zh-CN');
           return `
           <div class="flex items-center gap-4 px-4 py-3 hover:bg-background-hover">
@@ -89,7 +81,7 @@ if (!user) {
 
       list.querySelectorAll('.role-select').forEach((sel) => {
         sel.addEventListener('change', async () => {
-          const userId = sel.dataset.userId;
+          const userId = (sel as HTMLElement).dataset.userId;
           const role = (sel as HTMLSelectElement).value;
           await fetch('/api/users', {
             method: 'PUT',
@@ -101,8 +93,8 @@ if (!user) {
 
       list.querySelectorAll('.block-btn').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          const userId = btn.dataset.userId;
-          const blocked = btn.dataset.blocked === 'true';
+          const userId = (btn as HTMLElement).dataset.userId;
+          const blocked = (btn as HTMLElement).dataset.blocked === 'true';
           const action = blocked ? '封禁' : '解封';
           if (!confirm(`确定${action}此用户？`)) return;
           await fetch('/api/users', {
@@ -114,8 +106,7 @@ if (!user) {
         });
       });
     } catch {
-      document.getElementById('user-list').innerHTML =
-        `<div class="p-8 text-center text-error">加载失败</div>`;
+      getEl('user-list').innerHTML = `<div class="p-8 text-center text-error">加载失败</div>`;
     }
   }
 

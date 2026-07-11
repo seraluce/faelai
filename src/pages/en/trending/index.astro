@@ -2,7 +2,6 @@
 // src/pages/en/trending/index.astro
 // 功能：热门排行页面（英文） — 按浏览量排序的文章列表
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import NewsCard from '@/components/news/NewsCard.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);

@@ -5,11 +5,15 @@ import node from '@astrojs/node';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [
-    react(),
-  ],
+  integrations: [react()],
+  build: {
+    inlineStylesheets: 'auto',
+  },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      cssMinify: true,
+    },
   },
   output: 'server',
   adapter: node({
@@ -18,7 +22,9 @@ export default defineConfig({
   i18n: {
     defaultLocale: 'zh',
     locales: ['zh', 'en'],
-    prefixDefaultLocale: true,
+    routing: {
+      prefixDefaultLocale: true,
+    },
   },
   trailingSlash: 'never',
   server: {

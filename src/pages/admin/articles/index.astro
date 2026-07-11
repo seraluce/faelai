@@ -97,14 +97,28 @@ if (!user) {
 </AdminLayout>
 
 <script>
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  interface Article {
+    id: string;
+    title: string;
+    status: string;
+    author?: string;
+    publishedAt?: string;
+    createdAt: string;
+    viewCount?: number;
+  }
+
   let currentPage = 1;
   const limit = 20;
-  let selectedIds: Set<string> = new Set();
+  const selectedIds: Set<string> = new Set();
 
   async function loadArticles() {
-    const search = (document.getElementById('search-input') as HTMLInputElement)?.value || '';
-    const status = (document.getElementById('status-filter') as HTMLSelectElement)?.value || '';
-    const lang = (document.getElementById('lang-filter') as HTMLSelectElement)?.value || '';
+    const search = getEl<HTMLInputElement>('search-input').value || '';
+    const status = getEl<HTMLSelectElement>('status-filter').value || '';
+    const lang = getEl<HTMLSelectElement>('lang-filter').value || '';
 
     const params = new URLSearchParams({ page: String(currentPage), limit: String(limit) });
     if (search) params.set('search', search);
@@ -116,17 +130,17 @@ if (!user) {
       const data = await res.json();
       const { articles, pagination } = data;
 
-      document.getElementById('article-count').textContent = `共 ${pagination.total} 篇文章`;
-      const listEl = document.getElementById('article-list');
+      getEl('article-count').textContent = `共 ${pagination.total} 篇文章`;
+      const listEl = getEl('article-list');
 
       if (!articles || articles.length === 0) {
         listEl.innerHTML = `<div class="p-8 text-center text-text-tertiary">暂无文章</div>`;
-        document.getElementById('pagination').innerHTML = '';
+        getEl('pagination').innerHTML = '';
         return;
       }
 
       listEl.innerHTML = articles
-        .map((a) => {
+        .map((a: Article) => {
           const statusClass =
             a.status === 'published'
               ? 'bg-success/10 text-success'
@@ -162,18 +176,19 @@ if (!user) {
 
       // Checkbox events
       listEl.querySelectorAll('.article-checkbox').forEach((cb) => {
-        cb.addEventListener('change', () => {
-          const id = (cb as HTMLInputElement).dataset.id;
-          if ((cb as HTMLInputElement).checked) selectedIds.add(id);
-          else selectedIds.delete(id);
-          document
-            .getElementById('btn-delete-selected')
-            .classList.toggle('hidden', selectedIds.size === 0);
+        const input = cb as HTMLInputElement;
+        input.addEventListener('change', () => {
+          const id = input.dataset.id;
+          if (id) {
+            if (input.checked) selectedIds.add(id);
+            else selectedIds.delete(id);
+          }
+          getEl('btn-delete-selected').classList.toggle('hidden', selectedIds.size === 0);
         });
       });
 
       // Pagination
-      const paginationEl = document.getElementById('pagination');
+      const paginationEl = getEl('pagination');
       if (pagination.totalPages > 1) {
         let pages = '';
         for (let i = 1; i <= pagination.totalPages; i++) {
@@ -181,8 +196,9 @@ if (!user) {
         }
         paginationEl.innerHTML = `<div class="flex items-center justify-center gap-1">${pages}</div>`;
         paginationEl.querySelectorAll('button').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            currentPage = parseInt(btn.dataset.page);
+          const el = btn as HTMLElement;
+          el.addEventListener('click', () => {
+            currentPage = parseInt(el.dataset.page || '1');
             loadArticles();
           });
         });
@@ -190,25 +206,24 @@ if (!user) {
         paginationEl.innerHTML = '';
       }
     } catch {
-      document.getElementById('article-list').innerHTML =
-        `<div class="p-8 text-center text-error">加载失败</div>`;
+      getEl('article-list').innerHTML = `<div class="p-8 text-center text-error">加载失败</div>`;
     }
   }
 
-  document.getElementById('search-input')?.addEventListener('input', () => {
+  getEl<HTMLInputElement>('search-input').addEventListener('input', () => {
     currentPage = 1;
     loadArticles();
   });
-  document.getElementById('status-filter')?.addEventListener('change', () => {
+  getEl<HTMLSelectElement>('status-filter').addEventListener('change', () => {
     currentPage = 1;
     loadArticles();
   });
-  document.getElementById('lang-filter')?.addEventListener('change', () => {
+  getEl<HTMLSelectElement>('lang-filter').addEventListener('change', () => {
     currentPage = 1;
     loadArticles();
   });
 
-  document.getElementById('btn-delete-selected')?.addEventListener('click', async () => {
+  getEl('btn-delete-selected').addEventListener('click', async () => {
     if (!confirm(`确定删除 ${selectedIds.size} 篇文章？`)) return;
     for (const id of selectedIds) {
       await fetch('/api/articles/slug', {

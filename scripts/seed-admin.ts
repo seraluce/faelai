@@ -29,7 +29,9 @@ const users = sqliteTable('users', {
 });
 
 const userPasswords = sqliteTable('user_passwords', {
-  userId: text('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
   passwordHash: text('password_hash').notNull(),
 });
 
@@ -55,7 +57,11 @@ async function seedAdmin() {
   }
 
   const userId = generateId();
-  const passwordHash = await hash(adminPassword, { memoryCost: 19456, timeCost: 2, parallelism: 1 });
+  const passwordHash = await hash(adminPassword, {
+    memoryCost: 19456,
+    timeCost: 2,
+    parallelism: 1,
+  });
 
   await db.insert(users).values({
     id: userId,

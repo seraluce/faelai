@@ -3,8 +3,6 @@
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
 import { eq } from 'drizzle-orm';
-import { createSession, setSessionCookie } from '@/lib/auth/session';
-import { hashPassword } from '@/lib/auth/password';
 import { generateId, calculateReadingTime } from '@/lib/utils';
 
 export const GET: APIRoute = async ({ params }) => {
@@ -113,7 +111,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ request, locals, params }) => {
+export const PUT: APIRoute = async ({ request, locals, params: _params }) => {
   try {
     const user = locals.user;
     if (!user) {

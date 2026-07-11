@@ -122,20 +122,34 @@ if (!user) {
 </AdminLayout>
 
 <script>
-  const modal = document.getElementById('modal');
-  const form = document.getElementById('category-form');
+  function getEl<T extends HTMLElement = HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  const modal = getEl('modal');
+  const form = getEl<HTMLFormElement>('category-form');
   let editingId: string | null = null;
 
-  function openModal(category?: any) {
+  interface CategoryData {
+    id?: string;
+    name?: string;
+    nameEn?: string;
+    slug?: string;
+    description?: string;
+    color?: string;
+    sortOrder?: number;
+  }
+
+  function openModal(category?: CategoryData) {
     editingId = category?.id || null;
-    document.getElementById('modal-title').textContent = category ? '编辑分类' : '新增分类';
-    document.getElementById('edit-id').value = category?.id || '';
-    document.getElementById('edit-name').value = category?.name || '';
-    document.getElementById('edit-nameEn').value = category?.nameEn || '';
-    document.getElementById('edit-slug').value = category?.slug || '';
-    document.getElementById('edit-description').value = category?.description || '';
-    document.getElementById('edit-color').value = category?.color || '#0070f3';
-    document.getElementById('edit-sortOrder').value = category?.sortOrder || 0;
+    getEl('modal-title').textContent = category ? '编辑分类' : '新增分类';
+    getEl<HTMLInputElement>('edit-id').value = category?.id || '';
+    getEl<HTMLInputElement>('edit-name').value = category?.name || '';
+    getEl<HTMLInputElement>('edit-nameEn').value = category?.nameEn || '';
+    getEl<HTMLInputElement>('edit-slug').value = category?.slug || '';
+    getEl<HTMLTextAreaElement>('edit-description').value = category?.description || '';
+    getEl<HTMLInputElement>('edit-color').value = category?.color || '#0070f3';
+    getEl<HTMLInputElement>('edit-sortOrder').value = String(category?.sortOrder ?? 0);
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
@@ -149,7 +163,7 @@ if (!user) {
     try {
       const res = await fetch('/api/categories');
       const data = await res.json();
-      const list = document.getElementById('category-list');
+      const list = getEl('category-list');
 
       if (!data.categories || data.categories.length === 0) {
         list.innerHTML = `<div class="p-8 text-center text-text-tertiary">暂无分类</div>`;
@@ -158,7 +172,7 @@ if (!user) {
 
       list.innerHTML = data.categories
         .map(
-          (c) => `
+          (c: { color: string; name: string; nameEn: string; slug: string; id: string }) => `
         <div class="flex items-center justify-between px-4 py-3 hover:bg-background-hover">
           <div class="flex items-center gap-3">
             <div class="h-3 w-3 rounded-full" style="background-color: ${c.color || '#0070f3'}"></div>
@@ -182,28 +196,29 @@ if (!user) {
         .join('');
 
       list.querySelectorAll('.edit-btn').forEach((btn) => {
-        btn.addEventListener('click', () => openModal(JSON.parse(btn.dataset.edit)));
+        (btn as HTMLElement).addEventListener('click', () =>
+          openModal(JSON.parse((btn as HTMLElement).dataset.edit!))
+        );
       });
 
       list.querySelectorAll('.delete-btn').forEach((btn) => {
-        btn.addEventListener('click', async () => {
+        (btn as HTMLElement).addEventListener('click', async () => {
           if (!confirm('确定删除此分类？')) return;
           await fetch('/api/categories', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: btn.dataset.delete }),
+            body: JSON.stringify({ id: (btn as HTMLElement).dataset.delete }),
           });
           loadCategories();
         });
       });
     } catch {
-      document.getElementById('category-list').innerHTML =
-        `<div class="p-8 text-center text-error">加载失败</div>`;
+      getEl('category-list').innerHTML = `<div class="p-8 text-center text-error">加载失败</div>`;
     }
   }
 
-  document.getElementById('btn-add')?.addEventListener('click', () => openModal());
-  document.getElementById('btn-cancel')?.addEventListener('click', closeModal);
+  getEl('btn-add')?.addEventListener('click', () => openModal());
+  getEl('btn-cancel')?.addEventListener('click', closeModal);
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
   });
@@ -212,12 +227,12 @@ if (!user) {
     e.preventDefault();
     const body = {
       id: editingId || undefined,
-      name: document.getElementById('edit-name').value,
-      nameEn: document.getElementById('edit-nameEn').value || undefined,
-      slug: document.getElementById('edit-slug').value,
-      description: document.getElementById('edit-description').value || undefined,
-      color: document.getElementById('edit-color').value,
-      sortOrder: parseInt(document.getElementById('edit-sortOrder').value) || 0,
+      name: getEl<HTMLInputElement>('edit-name').value,
+      nameEn: getEl<HTMLInputElement>('edit-nameEn').value || undefined,
+      slug: getEl<HTMLInputElement>('edit-slug').value,
+      description: getEl<HTMLTextAreaElement>('edit-description').value || undefined,
+      color: getEl<HTMLInputElement>('edit-color').value,
+      sortOrder: parseInt(getEl<HTMLInputElement>('edit-sortOrder').value) || 0,
     };
 
     const method = editingId ? 'PUT' : 'POST';

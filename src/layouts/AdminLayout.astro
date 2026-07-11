@@ -6,7 +6,6 @@ import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils'
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
-const user = Astro.locals.user;
 ---
 
 <!-- Admin Layout: no header/footer, just admin sidebar + content -->

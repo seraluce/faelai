@@ -1,0 +1,96 @@
+---
+// src/pages/en/verify-email/index.astro
+// 功能：邮箱验证回调页面（英文） — 通过 token 验证邮箱
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const loginPath = getLocalizedPath('/login', lang);
+---
+
+<BaseLayout title={t('verifyEmail.title')}>
+  <div
+    class="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md items-center justify-center px-4 py-12"
+  >
+    <div class="w-full text-center">
+      <div id="verifying" class="space-y-4">
+        <div
+          class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-accent border-t-transparent"
+        >
+        </div>
+        <p class="text-text-secondary">Verifying...</p>
+      </div>
+
+      <div id="success-message" class="hidden space-y-4">
+        <p class="text-lg font-medium text-success">Email verified successfully</p>
+        <p class="text-sm text-text-secondary">
+          Your email has been verified. You can now sign in.
+        </p>
+        <a
+          href={loginPath}
+          class="inline-block rounded-lg bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent-hover"
+        >
+          {t('auth.login.title')}
+        </a>
+      </div>
+
+      <div id="error-message" class="hidden space-y-4">
+        <p class="text-lg font-medium text-error">Verification failed</p>
+        <p id="error-text" class="text-sm text-text-secondary"></p>
+        <a
+          href={loginPath}
+          class="inline-block rounded-lg bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent-hover"
+        >
+          {t('auth.login.title')}
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const verifying = document.getElementById('verifying');
+  const successMessage = document.getElementById('success-message');
+  const errorMessage = document.getElementById('error-message');
+  const errorText = document.getElementById('error-text');
+
+  async function verifyEmail() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (!token) {
+      verifying?.classList.add('hidden');
+      errorMessage?.classList.remove('hidden');
+      if (errorText) errorText.textContent = 'Missing verification token';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await res.json();
+
+      verifying?.classList.add('hidden');
+
+      if (!res.ok) {
+        errorMessage?.classList.remove('hidden');
+        if (errorText) errorText.textContent = data.error || 'Verification failed';
+        return;
+      }
+
+      successMessage?.classList.remove('hidden');
+    } catch {
+      verifying?.classList.add('hidden');
+      errorMessage?.classList.remove('hidden');
+      if (errorText) errorText.textContent = 'Network error, please try again later';
+    }
+  }
+
+  verifyEmail();
+</script>

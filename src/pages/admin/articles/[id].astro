@@ -1,11 +1,8 @@
 ---
 // src/pages/admin/articles/[id].astro
-// 功能：文章编辑页面 — 创建/编辑文章、标题、内容、分类、状态、封面图
+// 功能：文章编辑页面 — 创建/编辑文章、标题、内容、分类、标签、封面图上传、状态管理
 import AdminLayout from '@/layouts/AdminLayout.astro';
-import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 const user = Astro.locals.user;
 
 if (!user) {
@@ -114,15 +111,54 @@ const isNew = id === 'new';
                 <option value="en">英文</option>
               </select>
             </div>
-            <div>
-              <label for="coverImage" class="mb-1 block text-xs text-text-secondary"
-                >封面图 URL</label
+          </div>
+        </div>
+
+        {/* 标签 */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-4 text-sm font-medium text-text-primary">标签</h3>
+          <div id="tags-list" class="space-y-2">
+            <p class="text-xs text-text-tertiary">加载中...</p>
+          </div>
+        </div>
+
+        {/* 封面图 */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-4 text-sm font-medium text-text-primary">封面图</h3>
+          <div id="cover-preview" class="mb-3 hidden">
+            <img
+              id="cover-preview-img"
+              src=""
+              alt=""
+              class="w-full rounded-lg object-cover"
+              style="max-height:160px;"
+            />
+            <button type="button" id="cover-remove" class="mt-2 text-xs text-error hover:underline"
+              >移除封面</button
+            >
+          </div>
+          <div class="space-y-2">
+            <label
+              for="cover-upload"
+              class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-background px-4 py-3 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path></svg
               >
+              上传封面图
+            </label>
+            <input type="file" id="cover-upload" accept="image/*" class="hidden" />
+            <div class="relative">
               <input
                 type="url"
                 id="coverImage"
                 name="coverImage"
-                placeholder="https://..."
+                placeholder="或输入图片 URL：https://..."
                 class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
@@ -180,7 +216,39 @@ const isNew = id === 'new';
           select.appendChild(opt);
         });
       }
-    } catch {}
+    } catch {
+      // 加载分类失败时忽略
+    }
+  }
+
+  async function loadTags() {
+    try {
+      const res = await fetch('/api/tags');
+      if (res.ok) {
+        const data = await res.json();
+        const listEl = document.getElementById('tags-list');
+        if (data.tags && data.tags.length > 0) {
+          listEl.innerHTML = data.tags
+            .map(
+              (tag) => `
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" value="${tag.id}" class="tag-checkbox h-4 w-4 rounded border-border accent-accent" />
+              <span class="text-sm text-text-secondary">${tag.name}</span>
+            </label>
+          `
+            )
+            .join('');
+        } else {
+          listEl.innerHTML = '<p class="text-xs text-text-tertiary">暂无标签</p>';
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function getSelectedTagIds() {
+    return Array.from(document.querySelectorAll('.tag-checkbox:checked')).map((cb) => cb.value);
   }
 
   async function loadArticle() {
@@ -195,7 +263,16 @@ const isNew = id === 'new';
       document.getElementById('status').value = a.status || 'draft';
       document.getElementById('lang').value = a.lang || 'zh';
       document.getElementById('coverImage').value = a.coverImage || '';
+      if (a.coverImage) {
+        document.getElementById('cover-preview-img').src = a.coverImage;
+        document.getElementById('cover-preview').classList.remove('hidden');
+      }
       if (a.categoryId) document.getElementById('category').value = a.categoryId;
+      if (a.tagIds && a.tagIds.length > 0) {
+        document.querySelectorAll('.tag-checkbox').forEach((cb) => {
+          cb.checked = a.tagIds.includes(cb.value);
+        });
+      }
     } catch {
       alert('加载文章失败');
     }
@@ -216,6 +293,7 @@ const isNew = id === 'new';
       lang: document.getElementById('lang').value,
       status: statusOverride || document.getElementById('status').value,
       coverImage: document.getElementById('coverImage').value || undefined,
+      tagIds: getSelectedTagIds(),
     };
 
     try {
@@ -247,6 +325,39 @@ const isNew = id === 'new';
     }
   }
 
+  const coverUpload = document.getElementById('cover-upload');
+  const coverPreview = document.getElementById('cover-preview');
+  const coverPreviewImg = document.getElementById('cover-preview-img');
+  const coverInput = document.getElementById('coverImage');
+  const coverRemove = document.getElementById('cover-remove');
+
+  coverUpload?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('cover', file);
+    try {
+      const res = await fetch('/api/articles/upload-cover', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        coverInput.value = data.url;
+        coverPreviewImg.src = data.url;
+        coverPreview.classList.remove('hidden');
+      } else {
+        alert(data.error || '上传失败');
+      }
+    } catch {
+      alert('上传失败');
+    }
+    coverUpload.value = '';
+  });
+
+  coverRemove?.addEventListener('click', () => {
+    coverInput.value = '';
+    coverPreview.classList.add('hidden');
+    coverPreviewImg.src = '';
+  });
+
   document.getElementById('article-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     saveArticle();
@@ -269,5 +380,6 @@ const isNew = id === 'new';
   });
 
   loadCategories();
+  loadTags();
   loadArticle();
 </script>

@@ -1,0 +1,119 @@
+---
+// src/pages/en/terms/index.astro
+// 功能：服务条款页面（英文）
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('terms.title')}>
+  <div class="mx-auto max-w-4xl px-4 py-12">
+    <h1 class="mb-8 text-3xl font-bold text-text-primary">{t('terms.title')}</h1>
+    <p class="mb-8 text-text-secondary">Last updated: July 11, 2026</p>
+
+    <div class="space-y-6">
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">1. Service Description</h2>
+        <p class="text-text-secondary">
+          FaelAI is an AI news aggregation and publishing platform designed to track the latest
+          developments in artificial intelligence in real time. We collect and organize AI-related
+          news from various RSS subscription sources and present them to users in a structured
+          format. We reserve the right to modify, suspend, or terminate the service at any time.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">2. User Obligations</h2>
+        <p class="mb-3 text-text-secondary">By using this platform, you agree to:</p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>Provide truthful and accurate registration information</li>
+          <li>
+            Safeguard your account credentials and be responsible for all activities under your
+            account
+          </li>
+          <li>Not use the platform for any illegal or unauthorized purposes</li>
+          <li>Not attempt to bypass platform security measures or access controls</li>
+          <li>Promptly report any security vulnerabilities discovered</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">3. Content Policy</h2>
+        <p class="mb-3 text-text-secondary">
+          The following behaviors are strictly prohibited on this platform:
+        </p>
+        <ul class="list-disc space-y-2 pl-6 text-text-secondary">
+          <li>
+            Posting content that is illegal, harmful, threatening, defamatory, obscene, or otherwise
+            objectionable
+          </li>
+          <li>Infringing upon the intellectual property rights or other legal rights of others</li>
+          <li>
+            Impersonating others or making false statements about relationships with any person or
+            organization
+          </li>
+          <li>Distributing spam, malware, or conducting phishing activities</li>
+          <li>Collecting personal information of other users without authorization</li>
+        </ul>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">4. Intellectual Property</h2>
+        <p class="text-text-secondary">
+          The platform's original content, design, code, and branding are protected by copyright law
+          and international intellectual property treaties. The copyright of news aggregation
+          content belongs to the original authors or sources. If you believe content on the platform
+          infringes your intellectual property rights, please contact us at admin@faelai.com.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">5. Disclaimer</h2>
+        <p class="text-text-secondary">
+          The content provided on this platform is for reference and information purposes only and
+          does not constitute professional advice. We strive for accuracy but do not guarantee the
+          completeness, reliability, or timeliness of the content. We are not liable for any losses
+          arising from the use of or reliance on platform content.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">6. Limitation of Liability</h2>
+        <p class="text-text-secondary">
+          To the maximum extent permitted by law, FaelAI and its affiliates shall not be liable for
+          any indirect, incidental, special, or consequential damages arising from the use of this
+          platform, including but not limited to loss of profits, data, or business interruption.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">7. Termination</h2>
+        <p class="text-text-secondary">
+          We reserve the right to suspend or terminate your access to the platform at any time
+          without prior notice, including but not limited to cases of violation of these terms. You
+          may also terminate your account at any time. Upon termination, we may retain certain data
+          to comply with legal obligations.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">8. Governing Law</h2>
+        <p class="text-text-secondary">
+          These terms are governed by the laws of the People's Republic of China. Any disputes
+          arising from or related to these terms shall be submitted to the competent People's Court
+          for resolution.
+        </p>
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-8">
+        <h2 class="mb-4 text-xl font-semibold text-text-primary">9. Contact Us</h2>
+        <p class="text-text-secondary">
+          If you have any questions about these terms of service, please contact us at:
+        </p>
+        <p class="mt-2 text-text-secondary">Email: admin@faelai.com</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

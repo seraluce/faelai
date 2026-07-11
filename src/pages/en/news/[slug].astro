@@ -7,8 +7,6 @@ import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils'
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const { slug } = Astro.params;
-
 const article = {
   title: 'OpenAI Releases GPT-5 with Enhanced Reasoning Capabilities',
   slug: 'openai-releases-gpt-5-with-reasoning-capabilities',

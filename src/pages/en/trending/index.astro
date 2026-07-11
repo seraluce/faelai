@@ -3,65 +3,18 @@
 // 功能：热门排行页面（英文） — 按浏览量排序的文章列表
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+import { db, schema } from '@/lib/db';
+import { eq, desc, and } from 'drizzle-orm';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const trendingArticles = [
-  {
-    title: 'AI Agent Automation Workflow Guide',
-    slug: 'ai-agent-automation-workflow',
-    excerpt:
-      'Deep dive into AI Agent design patterns and best practices for building efficient automation workflows.',
-    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    readingTime: 12,
-    viewCount: 5600,
-  },
-  {
-    title: 'RAG Technology Best Practices: From Beginner to Expert',
-    slug: 'rag-best-practices',
-    excerpt: 'Comprehensive guide to RAG implementation strategies and optimization techniques.',
-    coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
-    readingTime: 15,
-    viewCount: 4200,
-  },
-  {
-    title: 'LLM Fine-Tuning Tutorial',
-    slug: 'llm-fine-tuning-tutorial',
-    excerpt:
-      'Step-by-step guide to fine-tuning large language models for specific business scenarios.',
-    coverImage: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
-    readingTime: 10,
-    viewCount: 3800,
-  },
-  {
-    title: 'Diffusion Model Explained',
-    slug: 'diffusion-model-explained',
-    excerpt:
-      'Deep understanding of the mathematical principles and implementation details of diffusion models.',
-    coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 96 * 60 * 60 * 1000),
-    readingTime: 8,
-    viewCount: 3200,
-  },
-  {
-    title: 'AI Coding Assistant Comparison',
-    slug: 'ai-coding-assistant-comparison',
-    excerpt: 'Comparing GitHub Copilot, Cursor, Codeium and other leading AI coding assistants.',
-    coverImage: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 120 * 60 * 60 * 1000),
-    readingTime: 7,
-    viewCount: 2900,
-  },
-];
+const articles = await db
+  .select()
+  .from(schema.articles)
+  .where(and(eq(schema.articles.status, 'published'), eq(schema.articles.lang, 'en')))
+  .orderBy(desc(schema.articles.viewCount))
+  .limit(20);
 ---
 
 <BaseLayout title={t('nav.trending')}>
@@ -73,7 +26,7 @@ const trendingArticles = [
 
     <div class="space-y-4">
       {
-        trendingArticles.map((article, index) => (
+        articles.map((article, index) => (
           <a
             href={getLocalizedPath('/news/' + article.slug, lang)}
             class="group flex gap-6 rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
@@ -87,9 +40,9 @@ const trendingArticles = [
               </h2>
               <p class="mt-2 line-clamp-2 text-sm text-text-secondary">{article.excerpt}</p>
               <div class="mt-3 flex items-center gap-4 text-xs text-text-tertiary">
-                <span>{article.sourceName}</span>
-                <span>{article.readingTime} min read</span>
-                <span>{article.viewCount.toLocaleString()} views</span>
+                {article.sourceName && <span>{article.sourceName}</span>}
+                {article.readingTime && <span>{article.readingTime} min read</span>}
+                <span>{(article.viewCount ?? 0).toLocaleString()} views</span>
               </div>
             </div>
             {article.coverImage && (
@@ -105,5 +58,13 @@ const trendingArticles = [
         ))
       }
     </div>
+
+    {
+      articles.length === 0 && (
+        <div class="py-12 text-center">
+          <p class="text-text-tertiary">{t('common.noData')}</p>
+        </div>
+      )
+    }
   </div>
 </BaseLayout>

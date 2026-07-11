@@ -1,6 +1,6 @@
 ---
 // src/pages/en/search/index.astro
-// 功能：搜索页面（英文） — 搜索输入框、防抖搜索、结果展示
+// 功能：搜索页面（英文） — 搜索输入框、防抖搜索、调用 API 展示结果
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 
@@ -53,36 +53,58 @@ const t = useTranslations(lang);
 
   let debounceTimer: ReturnType<typeof setTimeout>;
 
+  function renderResults(articles: any[]) {
+    if (articles.length === 0) {
+      results.innerHTML =
+        '<div class="py-12 text-center"><p class="text-text-tertiary">No results found</p></div>';
+      return;
+    }
+
+    const items = articles
+      .map(
+        (a) => `
+        <a href="/en/news/${a.slug}" class="block rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover">
+          <h3 class="font-semibold text-text-primary">${a.title}</h3>
+          ${a.excerpt ? `<p class="mt-2 text-sm text-text-secondary">${a.excerpt.length > 150 ? a.excerpt.slice(0, 150) + '...' : a.excerpt}</p>` : ''}
+          <div class="mt-3 flex items-center gap-4 text-xs text-text-tertiary">
+            ${a.sourceName ? `<span>${a.sourceName}</span>` : ''}
+            ${a.readingTime ? `<span>${a.readingTime} min read</span>` : ''}
+          </div>
+        </a>`
+      )
+      .join('');
+
+    results.innerHTML = `
+      <div class="space-y-4">
+        <p class="text-sm text-text-tertiary">Found ${articles.length} results</p>
+        ${items}
+      </div>
+    `;
+  }
+
   input?.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
+    debounceTimer = setTimeout(async () => {
       const query = input.value.trim();
       if (!query) {
         results.innerHTML =
           '<div class="py-12 text-center"><p class="text-text-tertiary">Type to start searching</p></div>';
         return;
       }
-      results.innerHTML = `
-        <div class="space-y-4">
-          <p class="text-sm text-text-tertiary">Found 3 results</p>
-          <a href="/en/news/openai-releases-gpt-5-with-reasoning-capabilities" class="block rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover">
-            <h3 class="font-semibold text-text-primary">OpenAI Releases GPT-5 with Enhanced Reasoning Capabilities</h3>
-            <p class="mt-2 text-sm text-text-secondary">OpenAI has officially released GPT-5, achieving significant breakthroughs.</p>
-            <div class="mt-3 flex items-center gap-4 text-xs text-text-tertiary">
-              <span>OpenAI Blog</span>
-              <span>5 min read</span>
-            </div>
-          </a>
-          <a href="/en/news/anthropic-claude-4-safety-research" class="block rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover">
-            <h3 class="font-semibold text-text-primary">Anthropic Publishes Claude 4 Safety Research Report</h3>
-            <p class="mt-2 text-sm text-text-secondary">Anthropic has released an in-depth research report on Claude 4 safety.</p>
-            <div class="mt-3 flex items-center gap-4 text-xs text-text-tertiary">
-              <span>Anthropic</span>
-              <span>8 min read</span>
-            </div>
-          </a>
-        </div>
-      `;
+
+      results.innerHTML =
+        '<div class="py-12 text-center"><p class="text-text-tertiary">Searching...</p></div>';
+
+      try {
+        const res = await fetch(
+          `/api/articles?search=${encodeURIComponent(query)}&status=published&lang=en&limit=20`
+        );
+        const data = await res.json();
+        renderResults(data.articles || []);
+      } catch {
+        results.innerHTML =
+          '<div class="py-12 text-center"><p class="text-text-tertiary">Search error, please try again</p></div>';
+      }
     }, 300);
   });
 </script>

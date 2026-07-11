@@ -4,144 +4,76 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import NewsCard from '@/components/news/NewsCard.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+import { db, schema } from '@/lib/db';
+import { eq, desc, and, sql } from 'drizzle-orm';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Mock data for development
-const featuredArticles = [
-  {
-    title: 'OpenAI Releases GPT-5 with Enhanced Reasoning Capabilities',
-    slug: 'openai-releases-gpt-5-with-reasoning-capabilities',
-    excerpt:
-      'OpenAI has officially released GPT-5, achieving significant breakthroughs in mathematical reasoning, code generation, and multilingual understanding.',
-    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
-    sourceName: 'OpenAI Blog',
-    publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    readingTime: 5,
-  },
-  {
-    title: 'Anthropic Publishes Claude 4 Safety Research Report',
-    slug: 'anthropic-claude-4-safety-research',
-    excerpt:
-      'Anthropic has released an in-depth research report on Claude 4 safety, showcasing the latest progress in AI safety alignment.',
-    coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80',
-    sourceName: 'Anthropic',
-    publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
-    readingTime: 8,
-  },
-  {
-    title: 'Google DeepMind Achieves New Breakthrough in Protein Folding',
-    slug: 'google-deepmind-protein-folding-breakthrough',
-    excerpt:
-      "DeepMind's AlphaFold 3 has achieved new milestone results in protein structure prediction.",
-    coverImage: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
-    sourceName: 'MIT Tech Review',
-    publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-    readingTime: 6,
-  },
-];
+const langFilter = eq(schema.articles.lang, 'en');
+const publishedFilter = eq(schema.articles.status, 'published');
 
-const latestArticles = [
-  {
-    title: 'Meta Releases Llama 4 Open Source AI Model',
-    slug: 'meta-llama-4-open-source-ai-model',
-    excerpt:
-      'Meta has released the latest Llama 4 open source large language model, performing excellently in multiple benchmarks.',
-    coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
-    sourceName: 'TechCrunch',
-    publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-    readingTime: 4,
-    viewCount: 1250,
-  },
-  {
-    title: 'xAI Grok 3 Multimodal Update Released',
-    slug: 'xai-grok-3-multimodal-update',
-    excerpt:
-      'xAI announces major update for Grok 3, supporting image understanding and real-time information retrieval.',
-    coverImage: 'https://images.unsplash.com/photo-1676299081847-824916de030a?w=800&q=80',
-    sourceName: 'xAI',
-    publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000),
-    readingTime: 3,
-    viewCount: 890,
-  },
-  {
-    title: 'China Releases New AI Regulation Policy',
-    slug: 'china-ai-regulation-new-policy-2026',
-    excerpt:
-      'Chinese authorities have released the latest regulatory policy framework for artificial intelligence technology.',
-    sourceName: '机器之心',
-    publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
-    readingTime: 6,
-    viewCount: 2100,
-  },
-  {
-    title: 'Hugging Face Releases Transformers v5',
-    slug: 'huggingface-transformers-v5-release',
-    excerpt:
-      'Hugging Face introduces a major version update of the Transformers library, supporting more model architectures.',
-    coverImage: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80',
-    sourceName: 'Hugging Face',
-    publishedAt: new Date(Date.now() - 14 * 60 * 60 * 1000),
-    readingTime: 5,
-    viewCount: 670,
-  },
-  {
-    title: 'NVIDIA Releases Next-Gen AI Training GPU',
-    slug: 'nvidia-gpu-ai-training-optimization',
-    excerpt: 'NVIDIA introduces a new GPU architecture optimized for AI training.',
-    coverImage: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800&q=80',
-    sourceName: 'NVIDIA Blog',
-    publishedAt: new Date(Date.now() - 16 * 60 * 60 * 1000),
-    readingTime: 4,
-    viewCount: 1580,
-  },
-  {
-    title: 'Apple Intelligence iOS 20 New Features',
-    slug: 'apple-intelligence-ios-20-feature',
-    excerpt: 'Apple reveals new feature updates for Apple Intelligence in iOS 20.',
-    sourceName: 'The Verge',
-    publishedAt: new Date(Date.now() - 18 * 60 * 60 * 1000),
-    readingTime: 3,
-    viewCount: 3200,
-  },
-];
+// Featured articles (3)
+const featuredArticles = await db
+  .select()
+  .from(schema.articles)
+  .where(and(publishedFilter, langFilter, eq(schema.articles.isFeatured, true)))
+  .orderBy(desc(schema.articles.publishedAt))
+  .limit(3);
 
-const trendingArticles = [
-  {
-    title: 'AI Agent Automation Workflow Guide',
-    slug: 'ai-agent-automation-workflow',
-    viewCount: 5600,
-  },
-  { title: 'RAG Technology Best Practices', slug: 'rag-best-practices', viewCount: 4200 },
-  { title: 'LLM Fine-Tuning Tutorial', slug: 'llm-fine-tuning-tutorial', viewCount: 3800 },
-  { title: 'Diffusion Model Explained', slug: 'diffusion-model-explained', viewCount: 3200 },
-  {
-    title: 'AI Coding Assistant Comparison',
-    slug: 'ai-coding-assistant-comparison',
-    viewCount: 2900,
-  },
-];
+const featuredSlugs = new Set(featuredArticles.map((a) => a.slug));
+const needCount = 3 - featuredArticles.length;
+const fallbackFeatured =
+  needCount > 0
+    ? await db
+        .select()
+        .from(schema.articles)
+        .where(and(publishedFilter, langFilter))
+        .orderBy(desc(schema.articles.publishedAt))
+        .limit(needCount)
+    : [];
+const allFeatured = [
+  ...featuredArticles,
+  ...fallbackFeatured.filter((a) => !featuredSlugs.has(a.slug)),
+].slice(0, 3);
 
-const hotTopics = [
-  { name: 'GPT-5', count: 128 },
-  { name: 'AI Agent', count: 96 },
-  { name: 'Claude 4', count: 87 },
-  { name: 'Open Source', count: 75 },
-  { name: 'AI Safety', count: 68 },
-  { name: 'Multimodal', count: 54 },
-  { name: 'AI Coding', count: 49 },
-  { name: 'Robotics', count: 42 },
-];
+// Latest articles (6)
+const latestArticles = await db
+  .select()
+  .from(schema.articles)
+  .where(and(publishedFilter, langFilter))
+  .orderBy(desc(schema.articles.publishedAt))
+  .limit(6);
 
-const categories = [
-  { name: 'AI Companies', slug: 'ai-companies', icon: '🏢', color: '#0070f3' },
-  { name: 'Research', slug: 'research', icon: '📚', color: '#7928ca' },
-  { name: 'AI Products', slug: 'ai-products', icon: '🚀', color: '#ff0080' },
-  { name: 'Industry', slug: 'industry', icon: '📊', color: '#f5a623' },
-  { name: 'Open Source', slug: 'open-source', icon: '💻', color: '#50e3c2' },
-  { name: 'AI Ethics', slug: 'ai-ethics', icon: '⚖️', color: '#ee0000' },
-];
+// Trending articles by view count (5)
+const trendingArticles = await db
+  .select({
+    title: schema.articles.title,
+    slug: schema.articles.slug,
+    viewCount: schema.articles.viewCount,
+  })
+  .from(schema.articles)
+  .where(and(publishedFilter, langFilter))
+  .orderBy(desc(schema.articles.viewCount))
+  .limit(5);
+
+// Hot topics (tags + article count, 8)
+const hotTopics = await db
+  .select({
+    name: schema.tags.name,
+    slug: schema.tags.slug,
+    count: sql<number>`count(${schema.articleTags.articleId})`.as('count'),
+  })
+  .from(schema.tags)
+  .innerJoin(schema.articleTags, eq(schema.tags.id, schema.articleTags.tagId))
+  .innerJoin(schema.articles, eq(schema.articleTags.articleId, schema.articles.id))
+  .where(and(publishedFilter, langFilter))
+  .groupBy(schema.tags.id)
+  .orderBy(desc(sql`count(${schema.articleTags.articleId})`))
+  .limit(8);
+
+// Categories
+const categories = await db.select().from(schema.categories).orderBy(schema.categories.sortOrder);
 ---
 
 <BaseLayout title={t('home.hero.title')} description={t('home.hero.subtitle')}>
@@ -152,18 +84,13 @@ const categories = [
         <span class="shrink-0 bg-accent px-3 py-2 text-xs font-semibold text-white">BREAKING</span>
         <div class="relative flex-1 overflow-hidden">
           <div class="ticker-animate flex whitespace-nowrap py-2">
-            <span class="mx-8 text-sm text-text-secondary"
-              >OpenAI Releases GPT-5 with Enhanced Reasoning</span
-            >
-            <span class="mx-8 text-sm text-text-secondary"
-              >Anthropic Claude 4 Safety Research Published</span
-            >
-            <span class="mx-8 text-sm text-text-secondary"
-              >Google DeepMind Protein Folding Breakthrough</span
-            >
-            <span class="mx-8 text-sm text-text-secondary"
-              >Meta Llama 4 Open Source Model Released</span
-            >
+            {
+              latestArticles
+                .slice(0, 4)
+                .map((article) => (
+                  <span class="mx-8 text-sm text-text-secondary">{article.title}</span>
+                ))
+            }
           </div>
         </div>
       </div>
@@ -182,15 +109,19 @@ const categories = [
     </div>
 
     {/* Hero Grid */}
-    <div class="grid gap-6 md:grid-cols-2">
-      {/* Main Featured */}
-      <div class="md:row-span-2">
-        <NewsCard {...featuredArticles[0]} featured={true} {lang} />
-      </div>
-      {/* Side Featured */}
-      <NewsCard {...featuredArticles[1]} {lang} />
-      <NewsCard {...featuredArticles[2]} {lang} />
-    </div>
+    {
+      allFeatured.length > 0 && (
+        <div class="grid gap-6 md:grid-cols-2">
+          {/* Main Featured */}
+          <div class="md:row-span-2">
+            <NewsCard {...allFeatured[0]} featured={true} lang={lang} />
+          </div>
+          {/* Side Featured */}
+          {allFeatured[1] && <NewsCard {...allFeatured[1]} lang={lang} />}
+          {allFeatured[2] && <NewsCard {...allFeatured[2]} lang={lang} />}
+        </div>
+      )
+    }
   </section>
 
   {/* Main Content */}
@@ -230,7 +161,7 @@ const categories = [
                         {article.title}
                       </p>
                       <p class="text-xs text-text-tertiary">
-                        {article.viewCount.toLocaleString()} views
+                        {article.viewCount?.toLocaleString()} views
                       </p>
                     </div>
                   </a>
@@ -247,10 +178,7 @@ const categories = [
             {
               hotTopics.map((topic) => (
                 <a
-                  href={getLocalizedPath(
-                    '/tag/' + topic.name.toLowerCase().replace(/\s+/g, '-'),
-                    lang
-                  )}
+                  href={getLocalizedPath('/tag/' + topic.slug, lang)}
                   class="rounded-full border border-border px-3 py-1.5 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
                 >
                   {topic.name}
@@ -296,8 +224,10 @@ const categories = [
               href={getLocalizedPath('/category/' + category.slug, lang)}
               class="group flex flex-col items-center rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
             >
-              <span class="mb-3 text-3xl">{category.icon}</span>
-              <span class="text-sm font-medium text-text-primary">{category.name}</span>
+              {category.icon && <span class="mb-3 text-3xl" set:html={category.icon} />}
+              <span class="text-sm font-medium text-text-primary">
+                {lang === 'en' ? category.nameEn || category.name : category.name}
+              </span>
             </a>
           ))
         }

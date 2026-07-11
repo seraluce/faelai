@@ -6,14 +6,14 @@ import { formatRelativeTime, truncate } from '@/lib/utils';
 interface Props {
   title: string;
   slug: string;
-  excerpt?: string;
-  coverImage?: string;
-  sourceName?: string;
-  sourceUrl?: string;
-  author?: string;
-  publishedAt?: Date | number;
-  readingTime?: number;
-  viewCount?: number;
+  excerpt?: string | null;
+  coverImage?: string | null;
+  sourceName?: string | null;
+  sourceUrl?: string | null;
+  author?: string | null;
+  publishedAt?: Date | number | null;
+  readingTime?: number | null;
+  viewCount?: number | null;
   lang?: string;
   featured?: boolean;
 }

@@ -1,102 +1,101 @@
 ---
 // src/pages/news/[slug].astro
-// 功能：文章详情页面（中文） — 文章内容、元信息、封面图、相关文章
+// 功能：文章详情页面（中文） -- 从数据库查询真实文章数据、浏览量、相关文章、标签
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+import { db, schema } from '@/lib/db';
+import { eq, and, desc } from 'drizzle-orm';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const article = {
-  title: 'OpenAI 发布 GPT-5，推理能力大幅提升',
-  slug: 'openai-releases-gpt-5-with-reasoning-capabilities',
-  content: `
-    <p>OpenAI 今日正式发布了 GPT-5 模型，这是该公司迄今最强大的语言模型。在数学推理、代码生成和多语言理解方面取得了显著突破。</p>
-    
-    <h2>核心改进</h2>
-    <p>GPT-5 相比前代模型在多个关键领域实现了质的飞跃：</p>
-    <ul>
-      <li><strong>数学推理</strong>：在 IMO 和 AMC 等数学竞赛基准测试中达到金牌水平</li>
-      <li><strong>代码生成</strong>：能够独立完成复杂的软件工程项目，代码质量接近资深工程师</li>
-      <li><strong>多语言理解</strong>：支持 100+ 种语言，在非英语语言上的表现大幅提升</li>
-    </ul>
-    
-    <h2>安全对齐</h2>
-    <p>OpenAI 强调 GPT-5 在安全对齐方面也取得了重要进展。通过改进的 RLHF（基于人类反馈的强化学习）技术和新的宪法 AI 方法，模型在保持强大能力的同时，更好地遵循人类意图。</p>
-    
-    <h2>应用场景</h2>
-    <p>GPT-5 已经开始在以下场景中得到应用：</p>
-    <ul>
-      <li>科学研究辅助：帮助研究人员分析数据、设计实验</li>
-      <li>软件开发：从需求分析到代码实现的全流程辅助</li>
-      <li>教育培训：个性化的学习辅导和知识解答</li>
-      <li>创意写作：协助创作文章、故事和剧本</li>
-    </ul>
-    
-    <blockquote>
-      <p>"GPT-5 代表了我们在通用人工智能道路上的重要一步。它不仅更强大，而且更安全、更可靠。" —— Sam Altman, OpenAI CEO</p>
-    </blockquote>
-    
-    <h2>行业影响</h2>
-    <p>GPT-5 的发布在科技行业引起了广泛关注。多家分析机构认为，这将加速 AI 技术在企业中的采用，同时也会推动整个行业在 AI 安全方面的投入。</p>
-  `,
-  excerpt: 'OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。',
-  coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
-  author: '张明',
-  sourceName: 'OpenAI Blog',
-  sourceUrl: 'https://openai.com/blog',
-  publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-  readingTime: 5,
-  viewCount: 3247,
-  likeCount: 186,
-  commentCount: 42,
-  category: { name: 'AI 公司', slug: 'ai-companies' },
-  tags: ['GPT-5', 'OpenAI', '大语言模型', 'AI 推理'],
-};
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
 
-const relatedArticles = [
-  {
-    title: 'Anthropic 发布 Claude 4 安全研究报告',
-    slug: 'anthropic-claude-4-safety-research',
-    publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
-  },
-  {
-    title: 'Google DeepMind 在蛋白质折叠领域取得新突破',
-    slug: 'google-deepmind-protein-folding-breakthrough',
-    publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-  },
-  {
-    title: 'Meta 发布 Llama 4 开源 AI 模型',
-    slug: 'meta-llama-4-open-source-ai-model',
-    publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-  },
-];
+const articles = await db
+  .select()
+  .from(schema.articles)
+  .where(eq(schema.articles.slug, slug))
+  .limit(1);
+
+if (articles.length === 0) return Astro.redirect('/404');
+
+const article = articles[0];
+
+// 浏览量 +1
+await db
+  .update(schema.articles)
+  .set({ viewCount: (article.viewCount || 0) + 1 })
+  .where(eq(schema.articles.id, article.id));
+
+// 分类信息
+const category = article.categoryId
+  ? await db
+      .select()
+      .from(schema.categories)
+      .where(eq(schema.categories.id, article.categoryId))
+      .limit(1)
+      .then((rows) => rows[0] || null)
+  : null;
+
+// 标签
+const articleTags = await db
+  .select({ tagId: schema.articleTags.tagId, name: schema.tags.name, slug: schema.tags.slug })
+  .from(schema.articleTags)
+  .innerJoin(schema.tags, eq(schema.articleTags.tagId, schema.tags.id))
+  .where(eq(schema.articleTags.articleId, article.id));
+
+// 相关文章（同分类，排除当前）
+const relatedArticles = article.categoryId
+  ? await db
+      .select()
+      .from(schema.articles)
+      .where(
+        and(
+          eq(schema.articles.status, 'published'),
+          eq(schema.articles.categoryId, article.categoryId)
+        )
+      )
+      .orderBy(desc(schema.articles.publishedAt))
+      .limit(4)
+      .then((rows) => rows.filter((a) => a.id !== article.id).slice(0, 3))
+  : [];
 ---
 
-<BaseLayout title={article.title} description={article.excerpt} image={article.coverImage}>
+<BaseLayout
+  title={article.title}
+  description={article.excerpt || article.description || ''}
+  image={article.coverImage || undefined}
+  type="article"
+  publishedAt={article.publishedAt?.toISOString()}
+>
   <article class="mx-auto max-w-4xl px-4 py-8">
-    {/* Breadcrumb */}
+    {/* 面包屑 */}
     <nav class="mb-6 text-sm text-text-tertiary">
       <a href={getLocalizedPath('/', lang)} class="hover:text-accent">首页</a>
       <span class="mx-2">/</span>
       <a href={getLocalizedPath('/news', lang)} class="hover:text-accent">资讯</a>
       <span class="mx-2">/</span>
-      <span class="text-text-secondary">{article.category.name}</span>
+      <span class="text-text-secondary">{category?.name || '资讯'}</span>
     </nav>
 
-    {/* Article Header */}
+    {/* 文章头部 */}
     <header class="mb-8">
       <div class="mb-4 flex flex-wrap gap-2">
-        <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-          {article.category.name}
-        </span>
         {
-          article.tags.slice(0, 3).map((tag) => (
+          category && (
+            <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+              {category.name}
+            </span>
+          )
+        }
+        {
+          articleTags.slice(0, 3).map((tag) => (
             <a
-              href={getLocalizedPath('/tag/' + tag.toLowerCase().replace(/\s+/g, '-'), lang)}
+              href={getLocalizedPath('/tag/' + tag.slug, lang)}
               class="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-accent hover:text-accent"
             >
-              {tag}
+              {tag.name}
             </a>
           ))
         }
@@ -107,22 +106,22 @@ const relatedArticles = [
       </h1>
 
       <p class="mt-4 text-lg text-text-secondary">
-        {article.excerpt}
+        {article.excerpt || article.description}
       </p>
 
-      {/* Author & Meta */}
+      {/* 作者和元信息 */}
       <div class="mt-6 flex flex-wrap items-center gap-4 border-b border-border pb-6">
         <div class="flex items-center gap-3">
           <div
             class="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent"
           >
-            {article.author[0]}
+            {(article.author || 'A')[0]}
           </div>
           <div>
-            <p class="text-sm font-medium text-text-primary">{article.author}</p>
+            <p class="text-sm font-medium text-text-primary">{article.author || '佚名'}</p>
             <p class="text-xs text-text-tertiary">
               {
-                article.publishedAt.toLocaleDateString('zh-CN', {
+                article.publishedAt?.toLocaleDateString('zh-CN', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
@@ -132,15 +131,15 @@ const relatedArticles = [
           </div>
         </div>
         <div class="flex items-center gap-4 text-sm text-text-tertiary">
-          <span>{article.readingTime} 分钟阅读</span>
-          <span>{article.viewCount.toLocaleString()} 阅读</span>
-          <span>{article.likeCount} 点赞</span>
-          <span>{article.commentCount} 评论</span>
+          <span>{article.readingTime || 5} 分钟阅读</span>
+          <span>{(article.viewCount || 0).toLocaleString()} 阅读</span>
+          <span>{article.likeCount || 0} 点赞</span>
+          <span>{article.commentCount || 0} 评论</span>
         </div>
       </div>
     </header>
 
-    {/* Cover Image */}
+    {/* 封面图 */}
     {
       article.coverImage && (
         <div class="mb-8 overflow-hidden rounded-xl">
@@ -149,10 +148,10 @@ const relatedArticles = [
       )
     }
 
-    {/* Article Content */}
+    {/* 文章内容 */}
     <div class="prose mb-12" set:html={article.content} />
 
-    {/* Actions Bar */}
+    {/* 操作栏 */}
     <div
       class="mb-12 flex items-center justify-between rounded-xl border border-border bg-card p-4"
     >
@@ -199,7 +198,7 @@ const relatedArticles = [
       </div>
     </div>
 
-    {/* Source */}
+    {/* 来源 */}
     {
       article.sourceUrl && (
         <div class="mb-12 rounded-xl border border-border bg-card p-4">
@@ -211,39 +210,41 @@ const relatedArticles = [
               rel="noopener noreferrer"
               class="text-accent hover:underline"
             >
-              {article.sourceName} ↗
+              {article.sourceName || '原文链接'}
             </a>
           </p>
         </div>
       )
     }
 
-    {/* Related Articles */}
-    <div class="mb-12">
-      <h2 class="mb-6 text-xl font-semibold text-text-primary">{t('news.related')}</h2>
-      <div class="grid gap-4 sm:grid-cols-3">
-        {
-          relatedArticles.map((related) => (
-            <a
-              href={getLocalizedPath('/news/' + related.slug, lang)}
-              class="group rounded-xl border border-border bg-card p-4 transition-all hover:border-border-strong hover:bg-card-hover"
-            >
-              <h3 class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
-                {related.title}
-              </h3>
-              <p class="mt-2 text-xs text-text-tertiary">
-                {related.publishedAt.toLocaleDateString('zh-CN', {
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </p>
-            </a>
-          ))
-        }
-      </div>
-    </div>
+    {/* 相关文章 */}
+    {
+      relatedArticles.length > 0 && (
+        <div class="mb-12">
+          <h2 class="mb-6 text-xl font-semibold text-text-primary">{t('news.related')}</h2>
+          <div class="grid gap-4 sm:grid-cols-3">
+            {relatedArticles.map((related) => (
+              <a
+                href={getLocalizedPath('/news/' + related.slug, lang)}
+                class="group rounded-xl border border-border bg-card p-4 transition-all hover:border-border-strong hover:bg-card-hover"
+              >
+                <h3 class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
+                  {related.title}
+                </h3>
+                <p class="mt-2 text-xs text-text-tertiary">
+                  {related.publishedAt?.toLocaleDateString('zh-CN', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      )
+    }
 
-    {/* Comments placeholder */}
+    {/* 评论占位 */}
     <div class="rounded-xl border border-border bg-card p-6">
       <h2 class="mb-4 text-xl font-semibold text-text-primary">{t('news.comments')}</h2>
       <p class="text-sm text-text-secondary">评论功能即将上线，敬请期待。</p>

@@ -1,101 +1,99 @@
 ---
 // src/pages/en/news/[slug].astro
-// 功能：文章详情页面（英文） — 文章内容、元信息、封面图、相关文章
+// 功能：文章详情页面（英文） -- 从数据库查询真实文章数据、浏览量、相关文章、标签
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+import { db, schema } from '@/lib/db';
+import { eq, and, desc } from 'drizzle-orm';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const article = {
-  title: 'OpenAI Releases GPT-5 with Enhanced Reasoning Capabilities',
-  slug: 'openai-releases-gpt-5-with-reasoning-capabilities',
-  content: `
-    <p>OpenAI has officially released GPT-5, the company's most powerful language model to date. It achieves significant breakthroughs in mathematical reasoning, code generation, and multilingual understanding.</p>
-    
-    <h2>Key Improvements</h2>
-    <p>GPT-5 represents a qualitative leap over its predecessors in several critical areas:</p>
-    <ul>
-      <li><strong>Mathematical Reasoning</strong>: Achieves gold medal level on math competition benchmarks like IMO and AMC</li>
-      <li><strong>Code Generation</strong>: Can independently complete complex software engineering projects with code quality approaching senior engineers</li>
-      <li><strong>Multilingual Understanding</strong>: Supports 100+ languages with dramatically improved performance on non-English languages</li>
-    </ul>
-    
-    <h2>Safety Alignment</h2>
-    <p>OpenAI emphasizes that GPT-5 also makes important progress in safety alignment. Through improved RLHF (Reinforcement Learning from Human Feedback) techniques and new Constitutional AI methods, the model better follows human intent while maintaining strong capabilities.</p>
-    
-    <h2>Applications</h2>
-    <p>GPT-5 is already being applied in the following scenarios:</p>
-    <ul>
-      <li>Scientific Research: Helping researchers analyze data and design experiments</li>
-      <li>Software Development: Full-process assistance from requirements analysis to code implementation</li>
-      <li>Education: Personalized learning tutoring and knowledge解答</li>
-      <li>Creative Writing: Assisting in creating articles, stories, and scripts</li>
-    </ul>
-    
-    <blockquote>
-      <p>"GPT-5 represents an important step on our path to artificial general intelligence. It's not just more powerful — it's safer and more reliable." — Sam Altman, CEO of OpenAI</p>
-    </blockquote>
-    
-    <h2>Industry Impact</h2>
-    <p>The release of GPT-5 has garnered widespread attention in the tech industry. Multiple analyst firms believe this will accelerate AI adoption in enterprises while driving increased investment in AI safety across the industry.</p>
-  `,
-  excerpt:
-    'OpenAI has officially released GPT-5, achieving significant breakthroughs in mathematical reasoning, code generation, and multilingual understanding.',
-  coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
-  author: 'Ming Zhang',
-  sourceName: 'OpenAI Blog',
-  sourceUrl: 'https://openai.com/blog',
-  publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-  readingTime: 5,
-  viewCount: 3247,
-  likeCount: 186,
-  commentCount: 42,
-  category: { name: 'AI Companies', slug: 'ai-companies' },
-  tags: ['GPT-5', 'OpenAI', 'LLM', 'AI Reasoning'],
-};
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
 
-const relatedArticles = [
-  {
-    title: 'Anthropic Publishes Claude 4 Safety Research Report',
-    slug: 'anthropic-claude-4-safety-research',
-    publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
-  },
-  {
-    title: 'Google DeepMind Achieves New Breakthrough in Protein Folding',
-    slug: 'google-deepmind-protein-folding-breakthrough',
-    publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-  },
-  {
-    title: 'Meta Releases Llama 4 Open Source AI Model',
-    slug: 'meta-llama-4-open-source-ai-model',
-    publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-  },
-];
+const articles = await db
+  .select()
+  .from(schema.articles)
+  .where(eq(schema.articles.slug, slug))
+  .limit(1);
+
+if (articles.length === 0) return Astro.redirect('/404');
+
+const article = articles[0];
+
+// 浏览量 +1
+await db
+  .update(schema.articles)
+  .set({ viewCount: (article.viewCount || 0) + 1 })
+  .where(eq(schema.articles.id, article.id));
+
+// 分类信息
+const category = article.categoryId
+  ? await db
+      .select()
+      .from(schema.categories)
+      .where(eq(schema.categories.id, article.categoryId))
+      .limit(1)
+      .then((rows) => rows[0] || null)
+  : null;
+
+// 标签
+const articleTags = await db
+  .select({ tagId: schema.articleTags.tagId, name: schema.tags.name, slug: schema.tags.slug })
+  .from(schema.articleTags)
+  .innerJoin(schema.tags, eq(schema.articleTags.tagId, schema.tags.id))
+  .where(eq(schema.articleTags.articleId, article.id));
+
+// 相关文章（同分类，排除当前）
+const relatedArticles = article.categoryId
+  ? await db
+      .select()
+      .from(schema.articles)
+      .where(
+        and(
+          eq(schema.articles.status, 'published'),
+          eq(schema.articles.categoryId, article.categoryId)
+        )
+      )
+      .orderBy(desc(schema.articles.publishedAt))
+      .limit(4)
+      .then((rows) => rows.filter((a) => a.id !== article.id).slice(0, 3))
+  : [];
 ---
 
-<BaseLayout title={article.title} description={article.excerpt} image={article.coverImage}>
+<BaseLayout
+  title={article.title}
+  description={article.excerpt || article.description || ''}
+  image={article.coverImage || undefined}
+  type="article"
+  publishedAt={article.publishedAt?.toISOString()}
+>
   <article class="mx-auto max-w-4xl px-4 py-8">
     <nav class="mb-6 text-sm text-text-tertiary">
       <a href={getLocalizedPath('/', lang)} class="hover:text-accent">Home</a>
       <span class="mx-2">/</span>
       <a href={getLocalizedPath('/news', lang)} class="hover:text-accent">News</a>
       <span class="mx-2">/</span>
-      <span class="text-text-secondary">{article.category.name}</span>
+      <span class="text-text-secondary">{category?.name || 'News'}</span>
     </nav>
 
     <header class="mb-8">
       <div class="mb-4 flex flex-wrap gap-2">
-        <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-          {article.category.name}
-        </span>
         {
-          article.tags.slice(0, 3).map((tag) => (
+          category && (
+            <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+              {category.name}
+            </span>
+          )
+        }
+        {
+          articleTags.slice(0, 3).map((tag) => (
             <a
-              href={getLocalizedPath('/tag/' + tag.toLowerCase().replace(/\s+/g, '-'), lang)}
+              href={getLocalizedPath('/tag/' + tag.slug, lang)}
               class="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-accent hover:text-accent"
             >
-              {tag}
+              {tag.name}
             </a>
           ))
         }
@@ -106,7 +104,7 @@ const relatedArticles = [
       </h1>
 
       <p class="mt-4 text-lg text-text-secondary">
-        {article.excerpt}
+        {article.excerpt || article.description}
       </p>
 
       <div class="mt-6 flex flex-wrap items-center gap-4 border-b border-border pb-6">
@@ -114,13 +112,13 @@ const relatedArticles = [
           <div
             class="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent"
           >
-            {article.author[0]}
+            {(article.author || 'A')[0]}
           </div>
           <div>
-            <p class="text-sm font-medium text-text-primary">{article.author}</p>
+            <p class="text-sm font-medium text-text-primary">{article.author || 'Anonymous'}</p>
             <p class="text-xs text-text-tertiary">
               {
-                article.publishedAt.toLocaleDateString('en-US', {
+                article.publishedAt?.toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
@@ -130,10 +128,10 @@ const relatedArticles = [
           </div>
         </div>
         <div class="flex items-center gap-4 text-sm text-text-tertiary">
-          <span>{article.readingTime} min read</span>
-          <span>{article.viewCount.toLocaleString()} views</span>
-          <span>{article.likeCount} likes</span>
-          <span>{article.commentCount} comments</span>
+          <span>{article.readingTime || 5} min read</span>
+          <span>{(article.viewCount || 0).toLocaleString()} views</span>
+          <span>{article.likeCount || 0} likes</span>
+          <span>{article.commentCount || 0} comments</span>
         </div>
       </div>
     </header>
@@ -205,36 +203,38 @@ const relatedArticles = [
               rel="noopener noreferrer"
               class="text-accent hover:underline"
             >
-              {article.sourceName} ↗
+              {article.sourceName || 'Original Article'}
             </a>
           </p>
         </div>
       )
     }
 
-    <div class="mb-12">
-      <h2 class="mb-6 text-xl font-semibold text-text-primary">{t('news.related')}</h2>
-      <div class="grid gap-4 sm:grid-cols-3">
-        {
-          relatedArticles.map((related) => (
-            <a
-              href={getLocalizedPath('/news/' + related.slug, lang)}
-              class="group rounded-xl border border-border bg-card p-4 transition-all hover:border-border-strong hover:bg-card-hover"
-            >
-              <h3 class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
-                {related.title}
-              </h3>
-              <p class="mt-2 text-xs text-text-tertiary">
-                {related.publishedAt.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </p>
-            </a>
-          ))
-        }
-      </div>
-    </div>
+    {
+      relatedArticles.length > 0 && (
+        <div class="mb-12">
+          <h2 class="mb-6 text-xl font-semibold text-text-primary">{t('news.related')}</h2>
+          <div class="grid gap-4 sm:grid-cols-3">
+            {relatedArticles.map((related) => (
+              <a
+                href={getLocalizedPath('/news/' + related.slug, lang)}
+                class="group rounded-xl border border-border bg-card p-4 transition-all hover:border-border-strong hover:bg-card-hover"
+              >
+                <h3 class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
+                  {related.title}
+                </h3>
+                <p class="mt-2 text-xs text-text-tertiary">
+                  {related.publishedAt?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      )
+    }
 
     <div class="rounded-xl border border-border bg-card p-6">
       <h2 class="mb-4 text-xl font-semibold text-text-primary">{t('news.comments')}</h2>

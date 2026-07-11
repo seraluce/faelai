@@ -3,62 +3,18 @@
 // 功能：热门排行页面（中文） — 按浏览量排序的文章列表
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+import { db, schema } from '@/lib/db';
+import { eq, desc, and } from 'drizzle-orm';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const trendingArticles = [
-  {
-    title: 'AI Agent 自动化工作流完全指南',
-    slug: 'ai-agent-automation-workflow',
-    excerpt: '深入解析 AI Agent 的设计模式和最佳实践，帮助开发者构建高效的自动化工作流。',
-    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    readingTime: 12,
-    viewCount: 5600,
-  },
-  {
-    title: 'RAG 技术最佳实践：从入门到精通',
-    slug: 'rag-best-practices',
-    excerpt: '全面介绍检索增强生成（RAG）技术的实现方案和优化策略。',
-    coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
-    readingTime: 15,
-    viewCount: 4200,
-  },
-  {
-    title: '大模型微调入门教程',
-    slug: 'llm-fine-tuning-tutorial',
-    excerpt: '手把手教你如何对大语言模型进行微调，适配特定业务场景。',
-    coverImage: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
-    readingTime: 10,
-    viewCount: 3800,
-  },
-  {
-    title: 'Diffusion 模型原理解析',
-    slug: 'diffusion-model-explained',
-    excerpt: '深入理解扩散模型的数学原理和实现细节。',
-    coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 96 * 60 * 60 * 1000),
-    readingTime: 8,
-    viewCount: 3200,
-  },
-  {
-    title: 'AI 编程助手对比评测',
-    slug: 'ai-coding-assistant-comparison',
-    excerpt: '对比 GitHub Copilot、Cursor、Codeium 等主流 AI 编程助手。',
-    coverImage: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800&q=80',
-    sourceName: 'FaelAI',
-    publishedAt: new Date(Date.now() - 120 * 60 * 60 * 1000),
-    readingTime: 7,
-    viewCount: 2900,
-  },
-];
+const articles = await db
+  .select()
+  .from(schema.articles)
+  .where(and(eq(schema.articles.status, 'published'), eq(schema.articles.lang, 'zh')))
+  .orderBy(desc(schema.articles.viewCount))
+  .limit(20);
 ---
 
 <BaseLayout title={t('nav.trending')}>
@@ -70,7 +26,7 @@ const trendingArticles = [
 
     <div class="space-y-4">
       {
-        trendingArticles.map((article, index) => (
+        articles.map((article, index) => (
           <a
             href={getLocalizedPath('/news/' + article.slug, lang)}
             class="group flex gap-6 rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
@@ -84,9 +40,9 @@ const trendingArticles = [
               </h2>
               <p class="mt-2 line-clamp-2 text-sm text-text-secondary">{article.excerpt}</p>
               <div class="mt-3 flex items-center gap-4 text-xs text-text-tertiary">
-                <span>{article.sourceName}</span>
-                <span>{article.readingTime} 分钟阅读</span>
-                <span>{article.viewCount.toLocaleString()} 阅读</span>
+                {article.sourceName && <span>{article.sourceName}</span>}
+                {article.readingTime && <span>{article.readingTime} 分钟阅读</span>}
+                <span>{(article.viewCount ?? 0).toLocaleString()} 阅读</span>
               </div>
             </div>
             {article.coverImage && (
@@ -102,5 +58,13 @@ const trendingArticles = [
         ))
       }
     </div>
+
+    {
+      articles.length === 0 && (
+        <div class="py-12 text-center">
+          <p class="text-text-tertiary">{t('common.noData')}</p>
+        </div>
+      )
+    }
   </div>
 </BaseLayout>

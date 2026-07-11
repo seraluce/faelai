@@ -27,3 +27,8 @@ Thumbs.db
 
 # logs
 npm-debug.log*
+dev.log
+dev-err.log
+
+# uploads
+public/uploads/

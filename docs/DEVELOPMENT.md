@@ -615,7 +615,103 @@ OG 图片通过 `/api/og.svg` 端点动态生成，无需手动制作图片。
 
 ---
 
-## 十五、站点配置（旧版，已迁移到第十二节）
+## 十五、Geist 设计系统规范
+
+本项目的 UI 设计参考 Vercel Geist Design System（https://vercel.com/geist/introduction），所有前端界面必须遵循以下规范。完整的色彩、字体、圆角、阴影、间距参数定义在 `src/styles/global.css` 的 `@theme` 中。
+
+### 15.1 色彩系统
+
+使用 10 级灰度色阶（gray-100 ~ gray-1000），每个级别有明确用途：
+
+| 级别           | 用途                 | 对应 Tailwind token       |
+| -------------- | -------------------- | ------------------------- |
+| background-100 | 默认页面/卡片背景    | `bg-background`           |
+| background-200 | 次级背景（微妙区分） | `bg-background-secondary` |
+| gray-100       | 组件默认背景         | `bg-card`                 |
+| gray-200       | 组件悬浮背景         | `bg-card-hover`           |
+| gray-300       | 组件激活背景         | `bg-background-hover`     |
+| gray-400       | 默认边框             | `border-border`           |
+| gray-500       | 悬浮边框             | `border-border-hover`     |
+| gray-600       | 激活边框             | `border-border-strong`    |
+| gray-700       | 禁用文字/图标        | `text-text-disabled`      |
+| gray-900       | 次要文字/图标        | `text-text-secondary`     |
+| gray-1000      | 主要文字/图标        | `text-text-primary`       |
+
+### 15.2 字体排版
+
+- 字体：Geist Sans（UI 和正文）、Geist Mono（代码和数据）
+- 标题：`font-weight: 600`，`letter-spacing` 随字号递减收紧
+- 正文：`font-weight: 400`，`line-height: 1.5` ~ `1.6`
+- 按钮文字：`font-weight: 500`
+
+### 15.3 圆角
+
+| 场景                 | 圆角                        |
+| -------------------- | --------------------------- |
+| 按钮、输入框、小控件 | `6px`（`--radius-sm`）      |
+| 卡片、菜单、模态框   | `12px`（`--radius-md`）     |
+| 全屏浮层             | `16px`（`--radius-lg`）     |
+| 头像、药丸标签       | `9999px`（`--radius-pill`） |
+
+### 15.4 阴影层级
+
+| 场景     | 阴影                                                                                              |
+| -------- | ------------------------------------------------------------------------------------------------- |
+| 抬升卡片 | `0 2px 2px rgba(0,0,0,0.04)`                                                                      |
+| 弹出菜单 | `0 1px 1px rgba(0,0,0,0.02), 0 4px 8px -4px rgba(0,0,0,0.04), 0 16px 24px -8px rgba(0,0,0,0.06)`  |
+| 模态框   | `0 1px 1px rgba(0,0,0,0.02), 0 8px 16px -4px rgba(0,0,0,0.04), 0 24px 32px -8px rgba(0,0,0,0.06)` |
+
+### 15.5 间距
+
+遵循 4px 基准网格：4, 8, 12, 16, 24, 32, 40, 64, 96px。
+三步节奏：8px 组内间距，16px 组间间距，32~40px 区块间距。卡片内边距 24px。
+
+### 15.6 动效
+
+- 大多数交互应感觉即时：0ms 是最佳选择
+- 状态变化：150ms，弹出菜单：200ms，覆盖层：300ms
+- 缓动函数：`cubic-bezier(0.175, 0.885, 0.32, 1.1)`
+- 尊重 `prefers-reduced-motion`
+
+### 15.7 按钮
+
+- 主按钮：实心填充（gray-1000 背景 + background-100 文字），高度 40px
+- 次按钮：background-100 背景 + 半透明边框，高度 40px
+- 三级按钮：透明背景 + gray-1000 文字，高度 40px
+- 圆角统一 `6px`
+
+### 15.8 焦点环
+
+双层焦点环：`box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #006bff`
+
+---
+
+## 十六、标点符号 HTML 实体规则
+
+全站所有输出的文本内容中，禁止直接使用以下标点符号的原始字符，必须替换为 HTML 实体：
+
+| 符号           | HTML 实体             | 使用场景   |
+| -------------- | --------------------- | ---------- |
+| `©`            | `&copy;`              | 版权声明   |
+| `\|`           | CSS 伪元素替代或 `\|` | 视觉分隔   |
+| `·`            | `&middot;`            | 分隔符列表 |
+| `—`（em dash） | `&mdash;`             | 破折号     |
+| `–`（en dash） | `&ndash;`             | 范围连接   |
+| `'`            | `&apos;`              | 撇号       |
+| `"`            | `&quot;`              | 双引号     |
+| `!`            | `!`                   | 感叹号     |
+| `?`            | `?`                   | 问号       |
+
+**规则细节：**
+
+1. HTML 模板中：直接写入 HTML 实体编码
+2. JavaScript 字符串中：使用 Unicode 转义或 HTML 实体
+3. CSS content 属性中：使用 CSS 转义（如 `content: '\a9'`）
+4. 分隔符优先使用 CSS 伪元素或 border 实现
+
+---
+
+## 十七、站点配置（旧版，已迁移到第十二节）
 
 集中管理在 `src/config/site.ts`，包含：
 

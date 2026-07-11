@@ -1,6 +1,6 @@
 ---
 // src/components/news/NewsCard.astro
-// 功能：新闻文章卡片 — 封面图、标题、摘要、来源、阅读时间、浏览量、相对时间
+// 功能：新闻文章卡片 — 封面图、标题、摘要、来源、阅读时间、浏览量、相对时间（Geist Design System）
 import { formatRelativeTime, truncate } from '@/lib/utils';
 
 interface Props {
@@ -33,38 +33,52 @@ const {
   featured = false,
 } = Astro.props;
 
-const articleUrl = sourceUrl || `/${lang}/news/${slug}`;
+const articleUrl = sourceName ? sourceUrl || `/${lang}/news/${slug}` : `/${lang}/news/${slug}`;
 const isExternal = !!sourceUrl;
 ---
 
 <article
-  class={`group relative overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-border-strong hover:bg-card-hover ${featured ? 'md:col-span-2' : ''}`}
+  class:list={[
+    'group relative overflow-hidden rounded-[12px] border border-border bg-card',
+    'transition-all duration-150',
+    'hover:border-border-hover hover:shadow-[0_2px_2px_rgba(0,0,0,0.04)]',
+    featured && 'md:col-span-2',
+  ]}
 >
   {
     coverImage && (
-      <div class={`aspect-video overflow-hidden ${featured ? 'md:aspect-[16/9]' : ''}`}>
+      <div
+        class:list={[
+          'overflow-hidden',
+          featured ? 'md:aspect-[16/9] aspect-video' : 'aspect-video',
+        ]}
+      >
         <img
           src={coverImage}
           alt={title}
-          class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          class="h-full w-full object-cover transition-transform duration-150 group-hover:scale-[1.03]"
           loading="lazy"
         />
       </div>
     )
   }
-  <div class="p-4">
+  <div class="p-6">
     {
       sourceName && (
-        <div class="mb-2 flex items-center gap-2">
-          <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-text-secondary">
+        <div class="mb-3 flex items-center gap-2">
+          <span class="rounded-[9999px] bg-[var(--color-muted)] px-2.5 py-0.5 text-xs font-medium text-text-secondary">
             {sourceName}
           </span>
-          {readingTime && <span class="text-xs text-text-tertiary">{readingTime} min read</span>}
+          {readingTime && <span class="text-xs text-text-disabled">{readingTime} min</span>}
         </div>
       )
     }
     <h3
-      class={`font-semibold text-text-primary transition-colors group-hover:text-accent ${featured ? 'text-xl md:text-2xl' : 'text-base'}`}
+      class:list={[
+        'font-semibold text-text-primary leading-snug',
+        'transition-colors duration-150 group-hover:text-accent',
+        featured ? 'text-xl md:text-2xl tracking-[-0.02em]' : 'text-base tracking-[-0.01em]',
+      ]}
     >
       <a
         href={articleUrl}
@@ -76,28 +90,31 @@ const isExternal = !!sourceUrl;
     </h3>
     {
       excerpt && (
-        <p class="mt-2 text-sm text-text-secondary line-clamp-2">{truncate(excerpt, 150)}</p>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed line-clamp-2">
+          {truncate(excerpt, 150)}
+        </p>
       )
     }
-    <div class="mt-4 flex items-center justify-between text-xs text-text-tertiary">
-      <div class="flex items-center gap-3">
-        {author && <span>{author}</span>}
+    <div class="mt-4 flex items-center justify-between text-xs text-text-disabled">
+      <div class="flex items-center gap-0">
+        {author && <span class="text-text-secondary">{author}</span>}
+        {author && publishedAt && <span class="mx-2 inline-block h-3 w-px bg-border" />}
         {publishedAt && <span>{formatRelativeTime(publishedAt, lang)}</span>}
       </div>
       {
         viewCount !== undefined && (
           <span class="flex items-center gap-1">
-            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.5"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
               />
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.5"
                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
               />
             </svg>

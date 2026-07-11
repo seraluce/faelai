@@ -23,7 +23,6 @@ const otherLangPath = getAlternateLanguagePath(currentPath, otherLang);
 
 const user = Astro.locals.user;
 
-// Lucide SVG icon map for categories
 const categoryIcons: Record<string, string> = {
   'building-2':
     '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h2m10-12h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-6 0h6M6 8h8M6 16h8" />',
@@ -40,49 +39,59 @@ const categoryIcons: Record<string, string> = {
 };
 ---
 
-<header class="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+<header
+  class="header-sticky sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl"
+>
+  <div class="mx-auto flex h-12 max-w-7xl items-center justify-between px-4">
     {/* Logo */}
-    <a href={getLocalizedPath('/', lang)} class="flex items-center gap-2 text-xl font-bold">
+    <a
+      href={getLocalizedPath('/', lang)}
+      class="flex items-center gap-2 text-xl font-bold tracking-tight"
+    >
       <span class="text-accent">Fael</span><span class="text-text-primary">AI</span>
     </a>
 
     {/* Desktop Nav */}
-    <nav class="hidden items-center gap-6 md:flex">
+    <nav class="hidden items-center gap-1 md:flex">
       {
-        siteConfig.nav.map((link) => (
-          <a
-            href={getLocalizedPath(link.path, lang)}
-            class={`flex items-center text-sm transition-colors hover:text-text-primary ${
-              currentPath === getLocalizedPath(link.path, lang)
-                ? 'font-medium text-text-primary'
-                : 'text-text-secondary'
-            }`}
-          >
-            {t(link.labelKey as any)}
-          </a>
-        ))
+        siteConfig.nav.map((link) => {
+          const isActive = currentPath === getLocalizedPath(link.path, lang);
+          return (
+            <a
+              href={getLocalizedPath(link.path, lang)}
+              class:list={[
+                'nav-link relative px-3 py-1.5 text-sm transition-colors duration-150',
+                isActive
+                  ? 'font-medium text-text-primary'
+                  : 'text-text-secondary hover:text-text-primary',
+              ]}
+            >
+              {t(link.labelKey as any)}
+            </a>
+          );
+        })
       }
 
       {/* Categories Dropdown */}
-      <div class="relative group">
+      <div class="relative header-dropdown">
         <button
-          class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary"
+          class="flex items-center gap-1 px-3 py-1.5 text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
         >
           {t('nav.categories')}
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
             ></path>
           </svg>
         </button>
         <div
-          class="invisible absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 rounded-xl border border-border bg-background-secondary p-2 opacity-0 shadow-2xl transition-all group-hover:visible group-hover:opacity-100"
+          class="dropdown-menu invisible absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 rounded-xl border border-border bg-background p-1.5 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100"
+          style="box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 4px 8px -4px rgba(0,0,0,0.04), 0 16px 24px -8px rgba(0,0,0,0.06);"
         >
           {
             siteConfig.categories.map((cat) => (
               <a
                 href={getLocalizedPath(cat.path, lang)}
-                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
               >
                 <svg
                   class="h-4 w-4 shrink-0"
@@ -99,24 +108,25 @@ const categoryIcons: Record<string, string> = {
       </div>
 
       {/* Topics Dropdown */}
-      <div class="relative group">
+      <div class="relative header-dropdown">
         <button
-          class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary"
+          class="flex items-center gap-1 px-3 py-1.5 text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
         >
           {t('nav.topics')}
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
             ></path>
           </svg>
         </button>
         <div
-          class="invisible absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-background-secondary p-2 opacity-0 shadow-2xl transition-all group-hover:visible group-hover:opacity-100"
+          class="dropdown-menu invisible absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-background p-1.5 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100"
+          style="box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 4px 8px -4px rgba(0,0,0,0.04), 0 16px 24px -8px rgba(0,0,0,0.06);"
         >
           {
             siteConfig.topics.map((topic) => (
               <a
                 href={getLocalizedPath(topic.path, lang)}
-                class="block rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+                class="block rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
               >
                 {getLabel(topic)}
               </a>
@@ -127,14 +137,14 @@ const categoryIcons: Record<string, string> = {
     </nav>
 
     {/* Right Actions */}
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1">
       {/* Search */}
       <a
         href={getLocalizedPath('/search', lang)}
-        class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+        class="icon-btn flex h-9 w-9 items-center justify-center rounded-md text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
         aria-label={t('nav.search')}
       >
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -146,7 +156,7 @@ const categoryIcons: Record<string, string> = {
       {/* Lang Toggle */}
       <a
         href={otherLangPath}
-        class="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+        class="flex h-9 items-center rounded-md px-3 text-sm font-medium text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
       >
         {otherLang === 'zh' ? '中' : 'EN'}
       </a>
@@ -154,10 +164,10 @@ const categoryIcons: Record<string, string> = {
       {/* Theme Toggle */}
       <button
         data-theme-toggle
-        class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+        class="icon-btn flex h-9 w-9 items-center justify-center rounded-md text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
         aria-label="Toggle theme"
       >
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -172,7 +182,7 @@ const categoryIcons: Record<string, string> = {
         user ? (
           <a
             href={getLocalizedPath('/dashboard', lang)}
-            class="flex h-9 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            class="btn-primary flex h-9 items-center gap-2 rounded-md bg-text-primary px-4 text-sm font-medium text-background transition-colors duration-150 hover:opacity-90"
           >
             {user.avatarUrl ? (
               <img
@@ -181,23 +191,23 @@ const categoryIcons: Record<string, string> = {
                 class="h-6 w-6 rounded-full object-cover"
               />
             ) : (
-              <div class="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs">
+              <div class="flex h-6 w-6 items-center justify-center rounded-full bg-border text-xs font-medium text-text-primary">
                 {(user.fullName || user.username)[0].toUpperCase()}
               </div>
             )}
             <span class="hidden sm:inline">{user.username}</span>
           </a>
         ) : (
-          <div class="hidden items-center gap-2 md:flex">
+          <div class="hidden items-center gap-1.5 md:flex">
             <a
               href={getLocalizedPath('/login', lang)}
-              class="rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+              class="btn-secondary rounded-md px-4 py-2 text-sm font-medium text-text-primary transition-colors duration-150 hover:bg-card-hover"
             >
               {t('nav.login')}
             </a>
             <a
               href={getLocalizedPath('/register', lang)}
-              class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+              class="btn-primary rounded-md bg-text-primary px-4 py-2 text-sm font-medium text-background transition-colors duration-150 hover:opacity-90"
             >
               {t('nav.register')}
             </a>
@@ -208,10 +218,10 @@ const categoryIcons: Record<string, string> = {
       {/* Mobile Menu */}
       <button
         id="mobile-menu-toggle"
-        class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary md:hidden"
+        class="icon-btn flex h-9 w-9 items-center justify-center rounded-md text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary md:hidden"
         aria-label="Menu"
       >
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -224,26 +234,26 @@ const categoryIcons: Record<string, string> = {
 
   {/* Mobile Menu Panel */}
   <div id="mobile-menu" class="hidden border-t border-border bg-background md:hidden">
-    <nav class="flex flex-col p-4">
+    <nav class="flex flex-col p-3">
       {
         siteConfig.nav.map((link) => (
           <a
             href={getLocalizedPath(link.path, lang)}
-            class="rounded-lg px-4 py-3 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+            class="rounded-lg px-4 py-2.5 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
           >
             {t(link.labelKey as any)}
           </a>
         ))
       }
       <div class="my-2 border-t border-border"></div>
-      <p class="px-4 py-2 text-xs font-medium uppercase tracking-wider text-text-tertiary">
+      <p class="px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-text-disabled">
         {t('nav.categories')}
       </p>
       {
         siteConfig.categories.map((cat) => (
           <a
             href={getLocalizedPath(cat.path, lang)}
-            class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+            class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
           >
             <svg
               class="h-4 w-4 shrink-0"
@@ -261,7 +271,7 @@ const categoryIcons: Record<string, string> = {
         user ? (
           <a
             href={getLocalizedPath('/dashboard', lang)}
-            class="rounded-lg px-4 py-3 text-sm font-medium text-accent transition-colors hover:bg-background-hover"
+            class="rounded-lg px-4 py-2.5 text-sm font-medium text-text-primary transition-colors duration-150 hover:bg-card-hover"
           >
             {t('nav.dashboard')}
           </a>
@@ -269,13 +279,13 @@ const categoryIcons: Record<string, string> = {
           <>
             <a
               href={getLocalizedPath('/login', lang)}
-              class="rounded-lg px-4 py-3 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+              class="rounded-lg px-4 py-2.5 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text-primary"
             >
               {t('nav.login')}
             </a>
             <a
               href={getLocalizedPath('/register', lang)}
-              class="mt-2 rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+              class="mt-2 rounded-lg bg-text-primary px-4 py-2.5 text-center text-sm font-medium text-background transition-colors duration-150 hover:opacity-90"
             >
               {t('nav.register')}
             </a>
@@ -285,6 +295,31 @@ const categoryIcons: Record<string, string> = {
     </nav>
   </div>
 </header>
+
+<style>
+  .header-dropdown:hover .dropdown-menu {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .icon-btn:focus-visible,
+  .nav-link:focus-visible,
+  .btn-primary:focus-visible,
+  .btn-secondary:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--color-background, #fff),
+      0 0 0 4px #006bff;
+    outline: none;
+  }
+
+  .btn-primary {
+    height: 40px;
+  }
+
+  .btn-secondary {
+    height: 40px;
+  }
+</style>
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {

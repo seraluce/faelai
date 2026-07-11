@@ -1,6 +1,6 @@
 ---
 // src/pages/en/index.astro
-// 功能：首页（英文） — 新闻滚动条、精选文章、最新资讯、热门排行、热门话题、分类导航、订阅表单
+// 功能：首页（英文） — 精选文章、最新资讯、热门排行、热门话题、分类导航、订阅表单
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import NewsCard from '@/components/news/NewsCard.astro';
 import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
@@ -77,33 +77,16 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
 ---
 
 <BaseLayout title={t('home.hero.title')} description={t('home.hero.subtitle')}>
-  {/* Breaking News Ticker */}
-  <div class="border-b border-border bg-background-secondary">
-    <div class="mx-auto max-w-7xl overflow-hidden">
-      <div class="flex items-center">
-        <span class="shrink-0 bg-accent px-3 py-2 text-xs font-semibold text-white">BREAKING</span>
-        <div class="relative flex-1 overflow-hidden">
-          <div class="ticker-animate flex whitespace-nowrap py-2">
-            {
-              latestArticles
-                .slice(0, 4)
-                .map((article) => (
-                  <span class="mx-8 text-sm text-text-secondary">{article.title}</span>
-                ))
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   {/* Hero Section */}
-  <section class="mx-auto max-w-7xl px-4 py-12">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-text-primary md:text-4xl">
+  <section class="mx-auto max-w-7xl px-4 pt-16 pb-12">
+    <div class="mb-10 max-w-2xl">
+      <h1
+        class="text-4xl font-semibold text-text-primary tracking-[-0.04em] md:text-5xl"
+        style="line-height: 1.1"
+      >
         {t('home.hero.title')}
       </h1>
-      <p class="mt-2 text-lg text-text-secondary">
+      <p class="mt-4 text-lg text-text-secondary leading-relaxed">
         {t('home.hero.subtitle')}
       </p>
     </div>
@@ -124,14 +107,24 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
     }
   </section>
 
+  {/* Divider */}
+  <div class="mx-auto max-w-7xl px-4">
+    <div class="border-t border-border"></div>
+  </div>
+
   {/* Main Content */}
   <section class="mx-auto max-w-7xl px-4 py-12">
     <div class="grid gap-8 lg:grid-cols-3">
       {/* Latest News */}
       <div class="lg:col-span-2">
         <div class="mb-6 flex items-center justify-between">
-          <h2 class="text-xl font-semibold text-text-primary">{t('home.latest')}</h2>
-          <a href={getLocalizedPath('/news', lang)} class="text-sm text-accent hover:underline">
+          <h2 class="text-xl font-semibold text-text-primary tracking-[-0.02em]">
+            {t('home.latest')}
+          </h2>
+          <a
+            href={getLocalizedPath('/news', lang)}
+            class="text-sm font-medium text-accent transition-colors duration-150 hover:text-accent-hover"
+          >
             {t('home.viewAll')}
           </a>
         </div>
@@ -143,24 +136,32 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
       {/* Sidebar */}
       <div class="space-y-8">
         {/* Trending */}
-        <div class="rounded-xl border border-border bg-card p-6">
-          <h3 class="mb-4 text-lg font-semibold text-text-primary">{t('home.trending')}</h3>
-          <ul class="space-y-4">
+        <div
+          class="rounded-[12px] border border-border bg-card p-6"
+          style="box-shadow: var(--shadow-card)"
+        >
+          <h3 class="mb-5 text-base font-semibold text-text-primary tracking-[-0.02em]">
+            {t('home.trending')}
+          </h3>
+          <ul class="space-y-0">
             {
               trendingArticles.map((article, index) => (
                 <li>
                   <a
                     href={getLocalizedPath('/news/' + article.slug, lang)}
-                    class="group flex gap-3"
+                    class:list={[
+                      'group flex items-start gap-3 py-3',
+                      index > 0 && 'border-t border-border',
+                    ]}
                   >
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-text-tertiary">
+                    <span class="flex h-6 w-6 shrink-0 items-center justify-center text-sm font-semibold text-text-disabled">
                       {index + 1}
                     </span>
-                    <div>
-                      <p class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
+                    <div class="min-w-0">
+                      <p class="text-sm font-medium text-text-primary leading-snug transition-colors duration-150 group-hover:text-accent">
                         {article.title}
                       </p>
-                      <p class="text-xs text-text-tertiary">
+                      <p class="mt-1 text-xs text-text-disabled">
                         {article.viewCount?.toLocaleString()} views
                       </p>
                     </div>
@@ -172,17 +173,22 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
         </div>
 
         {/* Hot Topics */}
-        <div class="rounded-xl border border-border bg-card p-6">
-          <h3 class="mb-4 text-lg font-semibold text-text-primary">{t('home.hot')}</h3>
+        <div
+          class="rounded-[12px] border border-border bg-card p-6"
+          style="box-shadow: var(--shadow-card)"
+        >
+          <h3 class="mb-5 text-base font-semibold text-text-primary tracking-[-0.02em]">
+            {t('home.hot')}
+          </h3>
           <div class="flex flex-wrap gap-2">
             {
               hotTopics.map((topic) => (
                 <a
                   href={getLocalizedPath('/tag/' + topic.slug, lang)}
-                  class="rounded-full border border-border px-3 py-1.5 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
+                  class="rounded-[6px] border border-border bg-background px-3 py-1.5 text-sm font-medium text-text-secondary transition-all duration-150 hover:border-border-hover hover:text-text-primary"
                 >
                   {topic.name}
-                  <span class="ml-1 text-xs text-text-tertiary">({topic.count})</span>
+                  <span class="ml-1 text-text-disabled">{topic.count}</span>
                 </a>
               ))
             }
@@ -190,8 +196,13 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
         </div>
 
         {/* Newsletter */}
-        <div class="rounded-xl border border-border bg-card p-6">
-          <h3 class="mb-2 text-lg font-semibold text-text-primary">Subscribe to Newsletter</h3>
+        <div
+          class="rounded-[12px] border border-border bg-card p-6"
+          style="box-shadow: var(--shadow-card)"
+        >
+          <h3 class="mb-1 text-base font-semibold text-text-primary tracking-[-0.02em]">
+            Subscribe to Newsletter
+          </h3>
           <p class="mb-4 text-sm text-text-secondary">
             Weekly curated AI news, delivered to your inbox
           </p>
@@ -199,11 +210,11 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
             <input
               type="email"
               placeholder="your@email.com"
-              class="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none"
+              class="min-w-0 flex-1 rounded-[6px] border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder-text-disabled transition-all duration-150 focus:border-accent focus:outline-none"
             />
             <button
               type="submit"
-              class="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+              class="shrink-0 rounded-[6px] bg-text-primary px-4 py-2 text-sm font-medium text-background transition-all duration-150 hover:bg-text-secondary"
             >
               Subscribe
             </button>
@@ -216,13 +227,15 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
   {/* Categories Section */}
   <section class="border-t border-border bg-background-secondary py-12">
     <div class="mx-auto max-w-7xl px-4">
-      <h2 class="mb-8 text-xl font-semibold text-text-primary">Explore Categories</h2>
+      <h2 class="mb-8 text-xl font-semibold text-text-primary tracking-[-0.02em]">
+        Explore Categories
+      </h2>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
         {
           categories.map((category) => (
             <a
               href={getLocalizedPath('/category/' + category.slug, lang)}
-              class="group flex flex-col items-center rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
+              class="group flex flex-col items-center rounded-[12px] border border-border bg-card p-6 transition-all duration-150 hover:border-border-hover hover:bg-card-hover"
             >
               {category.icon && <span class="mb-3 text-3xl" set:html={category.icon} />}
               <span class="text-sm font-medium text-text-primary">
@@ -235,25 +248,3 @@ const categories = await db.select().from(schema.categories).orderBy(schema.cate
     </div>
   </section>
 </BaseLayout>
-
-<style>
-  .ticker-animate {
-    animation: ticker 30s linear infinite;
-  }
-
-  @keyframes ticker {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
-  }
-
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-</style>

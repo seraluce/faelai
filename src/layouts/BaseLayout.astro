@@ -1,6 +1,6 @@
 ---
 // src/layouts/BaseLayout.astro
-// 功能：基础 HTML 布局 — head 标签（SEO/OG 自动生成/JSON-LD）、Header/Footer 插槽、主题切换、字体加载
+// 功能：基础 HTML 布局 — head 标签（SEO/OG 自动生成/JSON-LD）、Header/Footer 插槽、主题切换、Geist 字体加载
 import { getLangFromUrl } from '@/i18n/utils';
 import { siteConfig } from '@/config/site';
 import Header from '@/components/layout/Header.astro';
@@ -97,24 +97,18 @@ const ogImage = image || autoOgImage;
       href="/rss.xml"
     />
 
-    {/* Preconnect */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    {/* Performance: DNS prefetch for external services */}
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-
-    {/* Performance: Preload critical font stylesheet */}
+    {/* Geist Sans + Mono — Vercel CDN */}
     <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      as="style"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/geist@latest/dist/fonts/geist-sans/style.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/geist@latest/dist/fonts/geist-mono/style.css"
+    />
+
+    {/* Performance: DNS prefetch for CDN */}
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
 
     {/* JSON-LD Structured Data */}
     <script

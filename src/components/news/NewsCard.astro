@@ -1,0 +1,88 @@
+---
+import { formatDate, formatRelativeTime, truncate } from '@/lib/utils';
+
+interface Props {
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImage?: string;
+  sourceName?: string;
+  sourceUrl?: string;
+  author?: string;
+  publishedAt?: Date | number;
+  readingTime?: number;
+  viewCount?: number;
+  lang?: string;
+  featured?: boolean;
+}
+
+const {
+  title,
+  slug,
+  excerpt,
+  coverImage,
+  sourceName,
+  sourceUrl,
+  author,
+  publishedAt,
+  readingTime,
+  viewCount,
+  lang = 'zh',
+  featured = false,
+} = Astro.props;
+
+const articleUrl = sourceUrl || `/${lang}/news/${slug}`;
+const isExternal = !!sourceUrl;
+---
+
+<article class={`group relative overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-border-strong hover:bg-card-hover ${featured ? 'md:col-span-2' : ''}`}>
+  {coverImage && (
+    <div class={`aspect-video overflow-hidden ${featured ? 'md:aspect-[16/9]' : ''}`}>
+      <img
+        src={coverImage}
+        alt={title}
+        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+      />
+    </div>
+  )}
+  <div class="p-4">
+    {sourceName && (
+      <div class="mb-2 flex items-center gap-2">
+        <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-text-secondary">
+          {sourceName}
+        </span>
+        {readingTime && (
+          <span class="text-xs text-text-tertiary">
+            {readingTime} min read
+          </span>
+        )}
+      </div>
+    )}
+    <h3 class={`font-semibold text-text-primary transition-colors group-hover:text-accent ${featured ? 'text-xl md:text-2xl' : 'text-base'}`}>
+      <a href={articleUrl} target={isExternal ? '_blank' : undefined} rel={isExternal ? 'noopener noreferrer' : undefined}>
+        {title}
+      </a>
+    </h3>
+    {excerpt && (
+      <p class="mt-2 text-sm text-text-secondary line-clamp-2">
+        {truncate(excerpt, 150)}
+      </p>
+    )}
+    <div class="mt-4 flex items-center justify-between text-xs text-text-tertiary">
+      <div class="flex items-center gap-3">
+        {author && <span>{author}</span>}
+        {publishedAt && <span>{formatRelativeTime(publishedAt, lang)}</span>}
+      </div>
+      {viewCount !== undefined && (
+        <span class="flex items-center gap-1">
+          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          {viewCount}
+        </span>
+      )}
+    </div>
+  </div>
+</article>

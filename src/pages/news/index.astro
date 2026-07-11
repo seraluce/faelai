@@ -1,0 +1,152 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NewsCard from '@/components/news/NewsCard.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const articles = [
+  {
+    title: 'OpenAI 发布 GPT-5，推理能力大幅提升',
+    slug: 'openai-releases-gpt-5-with-reasoning-capabilities',
+    excerpt: 'OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。',
+    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
+    sourceName: 'OpenAI Blog',
+    publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    readingTime: 5,
+    viewCount: 3200,
+  },
+  {
+    title: 'Anthropic 发布 Claude 4 安全研究报告',
+    slug: 'anthropic-claude-4-safety-research',
+    excerpt: 'Anthropic 发布了关于 Claude 4 安全性的深度研究报告，展示了在 AI 安全对齐方面的最新进展。',
+    coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80',
+    sourceName: 'Anthropic',
+    publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
+    readingTime: 8,
+    viewCount: 2100,
+  },
+  {
+    title: 'Google DeepMind 在蛋白质折叠领域取得新突破',
+    slug: 'google-deepmind-protein-folding-breakthrough',
+    excerpt: 'DeepMind 的 AlphaFold 3 在蛋白质结构预测方面取得了新的里程碑式成果。',
+    coverImage: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
+    sourceName: 'MIT Tech Review',
+    publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
+    readingTime: 6,
+    viewCount: 1800,
+  },
+  {
+    title: 'Meta 发布 Llama 4 开源 AI 模型',
+    slug: 'meta-llama-4-open-source-ai-model',
+    excerpt: 'Meta 推出了最新的 Llama 4 开源大语言模型，在多个基准测试中表现出色。',
+    coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
+    sourceName: 'TechCrunch',
+    publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
+    readingTime: 4,
+    viewCount: 1250,
+  },
+  {
+    title: 'xAI Grok 3 多模态更新发布',
+    slug: 'xai-grok-3-multimodal-update',
+    excerpt: 'xAI 宣布 Grok 3 的重大更新，支持图像理解和实时信息检索。',
+    coverImage: 'https://images.unsplash.com/photo-1676299081847-824916de030a?w=800&q=80',
+    sourceName: 'xAI',
+    publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000),
+    readingTime: 3,
+    viewCount: 890,
+  },
+  {
+    title: '中国发布 AI 监管新政策',
+    slug: 'china-ai-regulation-new-policy-2026',
+    excerpt: '中国相关部门发布了针对人工智能技术的最新监管政策框架。',
+    sourceName: '机器之心',
+    publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+    readingTime: 6,
+    viewCount: 2100,
+  },
+  {
+    title: 'Hugging Face 发布 Transformers v5',
+    slug: 'huggingface-transformers-v5-release',
+    excerpt: 'Hugging Face 推出 Transformers 库的重大版本更新，支持更多模型架构。',
+    coverImage: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80',
+    sourceName: 'Hugging Face',
+    publishedAt: new Date(Date.now() - 14 * 60 * 60 * 1000),
+    readingTime: 5,
+    viewCount: 670,
+  },
+  {
+    title: 'NVIDIA 发布新一代 AI 训练 GPU',
+    slug: 'nvidia-gpu-ai-training-optimization',
+    excerpt: 'NVIDIA 推出了专为 AI 训练优化的新一代 GPU 架构。',
+    coverImage: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800&q=80',
+    sourceName: 'NVIDIA Blog',
+    publishedAt: new Date(Date.now() - 16 * 60 * 60 * 1000),
+    readingTime: 4,
+    viewCount: 1580,
+  },
+];
+
+const categories = [
+  { name: '全部', slug: 'all' },
+  { name: 'AI 公司', slug: 'ai-companies' },
+  { name: '学术研究', slug: 'research' },
+  { name: 'AI 产品', slug: 'ai-products' },
+  { name: '行业动态', slug: 'industry' },
+  { name: '开源项目', slug: 'open-source' },
+];
+---
+
+<BaseLayout title={t('nav.news')} description={t('home.hero.subtitle')}>
+  <div class="mx-auto max-w-7xl px-4 py-8">
+    {/* Page Header */}
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('nav.news')}</h1>
+      <p class="mt-2 text-text-secondary">浏览所有 AI 新闻与资讯</p>
+    </div>
+
+    {/* Category Filter */}
+    <div class="mb-8 flex flex-wrap gap-2">
+      {categories.map((cat, i) => (
+        <button
+          class={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+            i === 0
+              ? 'bg-accent text-white'
+              : 'border border-border bg-background text-text-secondary hover:border-accent hover:text-accent'
+          }`}
+          data-category={cat.slug}
+        >
+          {cat.name}
+        </button>
+      ))}
+    </div>
+
+    {/* Articles Grid */}
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {articles.map(article => (
+        <NewsCard {...article} lang={lang} />
+      ))}
+    </div>
+
+    {/* Pagination */}
+    <div class="mt-12 flex justify-center">
+      <div class="flex items-center gap-2">
+        <button class="rounded-lg border border-border bg-background px-4 py-2 text-sm text-text-tertiary" disabled>
+          {t('common.prev')}
+        </button>
+        <span class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white">1</span>
+        <button class="rounded-lg border border-border bg-background px-4 py-2 text-sm text-text-secondary hover:bg-background-hover">
+          2
+        </button>
+        <button class="rounded-lg border border-border bg-background px-4 py-2 text-sm text-text-secondary hover:bg-background-hover">
+          3
+        </button>
+        <span class="px-2 text-text-tertiary">...</span>
+        <button class="rounded-lg border border-border bg-background px-4 py-2 text-sm text-text-secondary hover:bg-background-hover">
+          {t('common.next')}
+        </button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,97 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(getLocalizedPath('/login', lang));
+}
+---
+
+<BaseLayout title={t('dashboard.title')}>
+  <div class="mx-auto max-w-5xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('dashboard.title')}</h1>
+      <p class="mt-1 text-text-secondary">管理你的账号和内容</p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Profile Card */}
+      <div class="col-span-full rounded-xl border border-border bg-card p-6 sm:col-span-2 lg:col-span-1">
+        <div class="flex items-center gap-4">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-bold text-accent">
+            {(user.fullName || user.username)[0].toUpperCase()}
+          </div>
+          <div>
+            <h2 class="font-semibold text-text-primary">{user.fullName || user.username}</h2>
+            <p class="text-sm text-text-secondary">@{user.username}</p>
+            <p class="text-xs text-text-tertiary">{user.email}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      <div class="rounded-xl border border-border bg-card p-6">
+        <h3 class="mb-4 font-semibold text-text-primary">我的数据</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-sm text-text-secondary">发布文章</span>
+            <span class="text-sm font-medium text-text-primary">3</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-text-secondary">草稿</span>
+            <span class="text-sm font-medium text-text-primary">2</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-text-secondary">收藏</span>
+            <span class="text-sm font-medium text-text-primary">12</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div class="rounded-xl border border-border bg-card p-6">
+        <h3 class="mb-4 font-semibold text-text-primary">快捷操作</h3>
+        <div class="space-y-2">
+          <a href={getLocalizedPath('/dashboard/articles', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            📄 我的文章
+          </a>
+          <a href={getLocalizedPath('/dashboard/bookmarks', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            ⭐ 收藏夹
+          </a>
+          <a href={getLocalizedPath('/dashboard/profile', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            👤 个人资料
+          </a>
+          <a href={getLocalizedPath('/dashboard/settings', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            ⚙️ 设置
+          </a>
+        </div>
+      </div>
+
+      {/* Bookmarks */}
+      <div class="col-span-full rounded-xl border border-border bg-card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-text-primary">最近收藏</h3>
+          <a href={getLocalizedPath('/dashboard/bookmarks', lang)} class="text-sm text-accent hover:underline">查看全部</a>
+        </div>
+        <div class="space-y-3">
+          <a href={getLocalizedPath('/news/ai-agent-automation-workflow', lang)} class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover">
+            <span class="text-sm text-text-primary">AI Agent 自动化工作流指南</span>
+            <span class="text-xs text-text-tertiary">2 天前</span>
+          </a>
+          <a href={getLocalizedPath('/news/rag-best-practices', lang)} class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover">
+            <span class="text-sm text-text-primary">RAG 技术最佳实践</span>
+            <span class="text-xs text-text-tertiary">3 天前</span>
+          </a>
+          <a href={getLocalizedPath('/news/llm-fine-tuning-tutorial', lang)} class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover">
+            <span class="text-sm text-text-primary">大模型微调入门教程</span>
+            <span class="text-xs text-text-tertiary">5 天前</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

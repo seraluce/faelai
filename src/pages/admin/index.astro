@@ -1,0 +1,141 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(`/${lang}/login`);
+}
+
+const stats = [
+  { label: '总文章数', value: '128', change: '+12', icon: '📄' },
+  { label: '总用户数', value: '2,456', change: '+89', icon: '👥' },
+  { label: '今日访问', value: '12,340', change: '+5.2%', icon: '📊' },
+  { label: 'RSS 源', value: '24', change: '+2', icon: '📡' },
+];
+
+const recentArticles = [
+  { title: 'OpenAI 发布 GPT-5', status: 'published', views: 3200, date: '2 小时前' },
+  { title: 'Anthropic Claude 4 安全报告', status: 'published', views: 2100, date: '4 小时前' },
+  { title: 'DeepMind 蛋白质折叠突破', status: 'published', views: 1800, date: '6 小时前' },
+  { title: 'Meta Llama 4 开源模型', status: 'draft', views: 0, date: '8 小时前' },
+  { title: 'AI 监管新政策', status: 'review', views: 0, date: '12 小时前' },
+];
+
+const statusColors: Record<string, string> = {
+  published: 'bg-success/10 text-success',
+  draft: 'bg-warning/10 text-warning',
+  review: 'bg-accent/10 text-accent',
+};
+
+const statusLabels: Record<string, string> = {
+  published: '已发布',
+  draft: '草稿',
+  review: '审核中',
+};
+---
+
+<BaseLayout title={t('admin.title')}>
+  <div class="mx-auto max-w-7xl px-4 py-8">
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-text-primary">{t('admin.title')}</h1>
+        <p class="mt-1 text-text-secondary">欢迎回来，{user.fullName || user.username}</p>
+      </div>
+      <a
+        href="/admin/articles/new"
+        class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+      >
+        {t('dashboard.newArticle')}
+      </a>
+    </div>
+
+    {/* Stats */}
+    <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {stats.map(stat => (
+        <div class="rounded-xl border border-border bg-card p-6">
+          <div class="flex items-center justify-between">
+            <span class="text-2xl">{stat.icon}</span>
+            <span class="text-xs text-success">{stat.change}</span>
+          </div>
+          <p class="mt-4 text-2xl font-bold text-text-primary">{stat.value}</p>
+          <p class="text-sm text-text-secondary">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-3">
+      {/* Recent Articles */}
+      <div class="lg:col-span-2">
+        <div class="rounded-xl border border-border bg-card">
+          <div class="flex items-center justify-between border-b border-border p-4">
+            <h2 class="font-semibold text-text-primary">最近文章</h2>
+            <a href="/admin/articles" class="text-sm text-accent hover:underline">查看全部</a>
+          </div>
+          <div class="divide-y divide-border">
+            {recentArticles.map(article => (
+              <div class="flex items-center justify-between p-4">
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-text-primary">{article.title}</p>
+                  <p class="text-xs text-text-tertiary">{article.date}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                  {article.views > 0 && (
+                    <span class="text-xs text-text-tertiary">{article.views.toLocaleString()} 阅读</span>
+                  )}
+                  <span class={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[article.status]}`}>
+                    {statusLabels[article.status]}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Sidebar */}
+      <div class="space-y-6">
+        {/* Quick Links */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-4 font-semibold text-text-primary">快速操作</h3>
+          <div class="space-y-2">
+            <a href="/admin/articles" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+              <span>📄</span> 文章管理
+            </a>
+            <a href="/admin/feeds" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+              <span>📡</span> RSS 源管理
+            </a>
+            <a href="/admin/categories" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+              <span>🏷️</span> 分类管理
+            </a>
+            <a href="/admin/users" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+              <span>👥</span> 用户管理
+            </a>
+          </div>
+        </div>
+
+        {/* System Info */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-4 font-semibold text-text-primary">系统信息</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-text-secondary">版本</span>
+              <span class="text-text-primary">v0.1.0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-text-secondary">数据库状态</span>
+              <span class="text-success">正常</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-text-secondary">最后同步</span>
+              <span class="text-text-primary">5 分钟前</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

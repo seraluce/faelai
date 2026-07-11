@@ -1,0 +1,57 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NewsCard from '@/components/news/NewsCard.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const hotTopics = [
+  { name: 'GPT-5', count: 128, description: 'OpenAI 最新发布的 GPT-5 模型' },
+  { name: 'AI Agent', count: 96, description: '智能代理与自动化工作流' },
+  { name: 'Claude 4', count: 87, description: 'Anthropic 的 Claude 4 系列模型' },
+  { name: '开源模型', count: 75, description: '开源大语言模型生态' },
+  { name: 'AI 安全', count: 68, description: '人工智能安全与对齐研究' },
+  { name: '多模态', count: 54, description: '多模态 AI 技术发展' },
+  { name: 'AI 编程', count: 49, description: 'AI 辅助编程工具与技术' },
+  { name: '机器人', count: 42, description: '机器人与具身智能' },
+  { name: 'AI 芯片', count: 38, description: 'AI 专用芯片与硬件' },
+  { name: '视频生成', count: 35, description: 'AI 视频生成技术' },
+];
+---
+
+<BaseLayout title={t('nav.hot')}>
+  <div class="mx-auto max-w-7xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('nav.hot')}</h1>
+      <p class="mt-2 text-text-secondary">当前最热门的 AI 话题</p>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {hotTopics.map((topic, index) => (
+        <a
+          href={getLocalizedPath('/tag/' + topic.name.toLowerCase().replace(/\s+/g, '-'), lang)}
+          class="group rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
+        >
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
+                {topic.name}
+              </h2>
+              <p class="mt-2 text-sm text-text-secondary">{topic.description}</p>
+            </div>
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-bold text-accent">
+              {index + 1}
+            </span>
+          </div>
+          <div class="mt-4 flex items-center gap-2">
+            <svg class="h-4 w-4 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span class="text-sm text-text-tertiary">{topic.count} 篇相关文章</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

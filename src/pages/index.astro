@@ -1,0 +1,288 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NewsCard from '@/components/news/NewsCard.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Mock data for development
+const featuredArticles = [
+  {
+    title: 'OpenAI 发布 GPT-5，推理能力大幅提升',
+    slug: 'openai-releases-gpt-5-with-reasoning-capabilities',
+    excerpt: 'OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。',
+    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
+    sourceName: 'OpenAI Blog',
+    publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    readingTime: 5,
+  },
+  {
+    title: 'Anthropic 发布 Claude 4 安全研究报告',
+    slug: 'anthropic-claude-4-safety-research',
+    excerpt: 'Anthropic 发布了关于 Claude 4 安全性的深度研究报告，展示了在 AI 安全对齐方面的最新进展。',
+    coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80',
+    sourceName: 'Anthropic',
+    publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
+    readingTime: 8,
+  },
+  {
+    title: 'Google DeepMind 在蛋白质折叠领域取得新突破',
+    slug: 'google-deepmind-protein-folding-breakthrough',
+    excerpt: 'DeepMind 的 AlphaFold 3 在蛋白质结构预测方面取得了新的里程碑式成果。',
+    coverImage: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
+    sourceName: 'MIT Tech Review',
+    publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
+    readingTime: 6,
+  },
+];
+
+const latestArticles = [
+  {
+    title: 'Meta 发布 Llama 4 开源 AI 模型',
+    slug: 'meta-llama-4-open-source-ai-model',
+    excerpt: 'Meta 推出了最新的 Llama 4 开源大语言模型，在多个基准测试中表现出色。',
+    coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
+    sourceName: 'TechCrunch',
+    publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
+    readingTime: 4,
+    viewCount: 1250,
+  },
+  {
+    title: 'xAI Grok 3 多模态更新发布',
+    slug: 'xai-grok-3-multimodal-update',
+    excerpt: 'xAI 宣布 Grok 3 的重大更新，支持图像理解和实时信息检索。',
+    coverImage: 'https://images.unsplash.com/photo-1676299081847-824916de030a?w=800&q=80',
+    sourceName: 'xAI',
+    publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000),
+    readingTime: 3,
+    viewCount: 890,
+  },
+  {
+    title: '中国发布 AI 监管新政策',
+    slug: 'china-ai-regulation-new-policy-2026',
+    excerpt: '中国相关部门发布了针对人工智能技术的最新监管政策框架。',
+    sourceName: '机器之心',
+    publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+    readingTime: 6,
+    viewCount: 2100,
+  },
+  {
+    title: 'Hugging Face 发布 Transformers v5',
+    slug: 'huggingface-transformers-v5-release',
+    excerpt: 'Hugging Face 推出 Transformers 库的重大版本更新，支持更多模型架构。',
+    coverImage: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80',
+    sourceName: 'Hugging Face',
+    publishedAt: new Date(Date.now() - 14 * 60 * 60 * 1000),
+    readingTime: 5,
+    viewCount: 670,
+  },
+  {
+    title: 'NVIDIA 发布新一代 AI 训练 GPU',
+    slug: 'nvidia-gpu-ai-training-optimization',
+    excerpt: 'NVIDIA 推出了专为 AI 训练优化的新一代 GPU 架构。',
+    coverImage: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800&q=80',
+    sourceName: 'NVIDIA Blog',
+    publishedAt: new Date(Date.now() - 16 * 60 * 60 * 1000),
+    readingTime: 4,
+    viewCount: 1580,
+  },
+  {
+    title: 'Apple Intelligence iOS 20 新功能',
+    slug: 'apple-intelligence-ios-20-feature',
+    excerpt: 'Apple 公布了 iOS 20 中 Apple Intelligence 的全新功能更新。',
+    sourceName: 'The Verge',
+    publishedAt: new Date(Date.now() - 18 * 60 * 60 * 1000),
+    readingTime: 3,
+    viewCount: 3200,
+  },
+];
+
+const trendingArticles = [
+  { title: 'AI Agent 自动化工作流指南', slug: 'ai-agent-automation-workflow', viewCount: 5600 },
+  { title: 'RAG 技术最佳实践', slug: 'rag-best-practices', viewCount: 4200 },
+  { title: '大模型微调入门教程', slug: 'llm-fine-tuning-tutorial', viewCount: 3800 },
+  { title: 'Diffusion 模型原理解析', slug: 'diffusion-model-explained', viewCount: 3200 },
+  { title: 'AI 编程助手对比评测', slug: 'ai-coding-assistant-comparison', viewCount: 2900 },
+];
+
+const hotTopics = [
+  { name: 'GPT-5', count: 128 },
+  { name: 'AI Agent', count: 96 },
+  { name: 'Claude 4', count: 87 },
+  { name: '开源模型', count: 75 },
+  { name: 'AI 安全', count: 68 },
+  { name: '多模态', count: 54 },
+  { name: 'AI 编程', count: 49 },
+  { name: '机器人', count: 42 },
+];
+
+const categories = [
+  { name: 'AI 公司', slug: 'ai-companies', icon: '🏢', color: '#0070f3' },
+  { name: '学术研究', slug: 'research', icon: '📚', color: '#7928ca' },
+  { name: 'AI 产品', slug: 'ai-products', icon: '🚀', color: '#ff0080' },
+  { name: '行业动态', slug: 'industry', icon: '📊', color: '#f5a623' },
+  { name: '开源项目', slug: 'open-source', icon: '💻', color: '#50e3c2' },
+  { name: 'AI 伦理', slug: 'ai-ethics', icon: '⚖️', color: '#ee0000' },
+];
+---
+
+<BaseLayout title={t('home.hero.title')} description={t('home.hero.subtitle')}>
+  {/* Breaking News Ticker */}
+  <div class="border-b border-border bg-background-secondary">
+    <div class="mx-auto max-w-7xl overflow-hidden">
+      <div class="flex items-center">
+        <span class="shrink-0 bg-accent px-3 py-2 text-xs font-semibold text-white">BREAKING</span>
+        <div class="relative flex-1 overflow-hidden">
+          <div class="ticker-animate flex whitespace-nowrap py-2">
+            <span class="mx-8 text-sm text-text-secondary">OpenAI 发布 GPT-5，推理能力大幅提升</span>
+            <span class="mx-8 text-sm text-text-secondary">Anthropic Claude 4 安全研究报告发布</span>
+            <span class="mx-8 text-sm text-text-secondary">Google DeepMind 蛋白质折叠新突破</span>
+            <span class="mx-8 text-sm text-text-secondary">Meta Llama 4 开源模型发布</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Hero Section */}
+  <section class="mx-auto max-w-7xl px-4 py-12">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-text-primary md:text-4xl">
+        {t('home.hero.title')}
+      </h1>
+      <p class="mt-2 text-lg text-text-secondary">
+        {t('home.hero.subtitle')}
+      </p>
+    </div>
+
+    {/* Hero Grid */}
+    <div class="grid gap-6 md:grid-cols-2">
+      {/* Main Featured */}
+      <div class="md:row-span-2">
+        <NewsCard {...featuredArticles[0]} featured={true} />
+      </div>
+      {/* Side Featured */}
+      <NewsCard {...featuredArticles[1]} />
+      <NewsCard {...featuredArticles[2]} />
+    </div>
+  </section>
+
+  {/* Main Content */}
+  <section class="mx-auto max-w-7xl px-4 py-12">
+    <div class="grid gap-8 lg:grid-cols-3">
+      {/* Latest News */}
+      <div class="lg:col-span-2">
+        <div class="mb-6 flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-text-primary">{t('home.latest')}</h2>
+          <a href={getLocalizedPath('/news', lang)} class="text-sm text-accent hover:underline">
+            {t('home.viewAll')}
+          </a>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2">
+          {latestArticles.map(article => (
+            <NewsCard {...article} />
+          ))}
+        </div>
+      </div>
+
+      {/* Sidebar */}
+      <div class="space-y-8">
+        {/* Trending */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-4 text-lg font-semibold text-text-primary">{t('home.trending')}</h3>
+          <ul class="space-y-4">
+            {trendingArticles.map((article, index) => (
+              <li>
+                <a href={getLocalizedPath('/news/' + article.slug, lang)} class="group flex gap-3">
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-text-tertiary">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
+                      {article.title}
+                    </p>
+                    <p class="text-xs text-text-tertiary">
+                      {article.viewCount.toLocaleString()} views
+                    </p>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Hot Topics */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-4 text-lg font-semibold text-text-primary">{t('home.hot')}</h3>
+          <div class="flex flex-wrap gap-2">
+            {hotTopics.map(topic => (
+              <a
+                href={getLocalizedPath('/tag/' + topic.name.toLowerCase().replace(/\s+/g, '-'), lang)}
+                class="rounded-full border border-border px-3 py-1.5 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
+              >
+                {topic.name}
+                <span class="ml-1 text-xs text-text-tertiary">({topic.count})</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Newsletter */}
+        <div class="rounded-xl border border-border bg-card p-6">
+          <h3 class="mb-2 text-lg font-semibold text-text-primary">订阅周报</h3>
+          <p class="mb-4 text-sm text-text-secondary">每周精选 AI 新闻，直达邮箱</p>
+          <form class="flex gap-2">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              class="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none"
+            />
+            <button
+              type="submit"
+              class="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            >
+              订阅
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Categories Section */}
+  <section class="border-t border-border bg-background-secondary py-12">
+    <div class="mx-auto max-w-7xl px-4">
+      <h2 class="mb-8 text-xl font-semibold text-text-primary">探索分类</h2>
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+        {categories.map(category => (
+          <a
+            href={getLocalizedPath('/category/' + category.slug, lang)}
+            class="group flex flex-col items-center rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover"
+          >
+            <span class="mb-3 text-3xl">{category.icon}</span>
+            <span class="text-sm font-medium text-text-primary">{category.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ticker-animate {
+    animation: ticker 30s linear infinite;
+  }
+  
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

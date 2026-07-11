@@ -1,0 +1,213 @@
+---
+import { getLangFromUrl, useTranslations, getLocalizedPath, getAlternateLanguagePath } from '@/i18n/utils';
+import { siteConfig } from '@/config/site';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const currentPath = Astro.url.pathname;
+
+function getLabel(item: { zh?: string; en?: string; labelKey?: string }): string {
+  if (item.labelKey) return t(item.labelKey as any);
+  return lang === 'en' ? (item.en || item.zh || '') : (item.zh || item.en || '');
+}
+
+const otherLang = lang === 'zh' ? 'en' : 'zh';
+const otherLangPath = getAlternateLanguagePath(currentPath, otherLang);
+
+const user = Astro.locals.user;
+---
+
+<header class="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+    {/* Logo */}
+    <a href={getLocalizedPath('/', lang)} class="flex items-center gap-2 text-xl font-bold">
+      <span class="text-accent">Fael</span><span class="text-text-primary">AI</span>
+    </a>
+
+    {/* Desktop Nav */}
+    <nav class="hidden items-center gap-6 md:flex">
+      {siteConfig.nav.map(link => (
+        <a
+          href={getLocalizedPath(link.path, lang)}
+          class={`text-sm transition-colors hover:text-text-primary ${
+            currentPath === getLocalizedPath(link.path, lang)
+              ? 'font-medium text-text-primary'
+              : 'text-text-secondary'
+          }`}
+        >
+          {t(link.labelKey as any)}
+        </a>
+      ))}
+
+      {/* Categories Dropdown */}
+      <div class="relative group">
+        <button class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary">
+          {t('nav.categories')}
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="invisible absolute left-0 top-full z-50 mt-2 w-48 rounded-xl border border-border bg-background-secondary py-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+          {siteConfig.categories.map(cat => (
+            <a
+              href={getLocalizedPath(cat.path, lang)}
+              class="flex items-center gap-2 px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+            >
+              <span>{cat.icon}</span>
+              <span>{getLabel(cat)}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Topics Dropdown */}
+      <div class="relative group">
+        <button class="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-text-primary">
+          {t('nav.topics')}
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="invisible absolute left-0 top-full z-50 mt-2 w-48 rounded-xl border border-border bg-background-secondary py-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+          {siteConfig.topics.map(topic => (
+            <a
+              href={getLocalizedPath(topic.path, lang)}
+              class="block px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+            >
+              {getLabel(topic)}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+
+    {/* Right Actions */}
+    <div class="flex items-center gap-2">
+      {/* Search */}
+      <a
+        href={getLocalizedPath('/search', lang)}
+        class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+        aria-label={t('nav.search')}
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </a>
+
+      {/* Lang Toggle */}
+      <a
+        href={otherLangPath}
+        class="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+      >
+        {otherLang === 'zh' ? '中' : 'EN'}
+      </a>
+
+      {/* Theme Toggle */}
+      <button
+        data-theme-toggle
+        class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+        aria-label="Toggle theme"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
+
+      {/* Auth */}
+      {user ? (
+        <a
+          href={getLocalizedPath('/dashboard', lang)}
+          class="flex h-9 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+        >
+          <div class="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs">
+            {(user.fullName || user.username)[0].toUpperCase()}
+          </div>
+          <span class="hidden sm:inline">{user.username}</span>
+        </a>
+      ) : (
+        <div class="hidden items-center gap-2 md:flex">
+          <a
+            href={getLocalizedPath('/login', lang)}
+            class="rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+          >
+            {t('nav.login')}
+          </a>
+          <a
+            href={getLocalizedPath('/register', lang)}
+            class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+          >
+            {t('nav.register')}
+          </a>
+        </div>
+      )}
+
+      {/* Mobile Menu */}
+      <button
+        id="mobile-menu-toggle"
+        class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary md:hidden"
+        aria-label="Menu"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  {/* Mobile Menu Panel */}
+  <div id="mobile-menu" class="hidden border-t border-border bg-background md:hidden">
+    <nav class="flex flex-col p-4">
+      {siteConfig.nav.map(link => (
+        <a
+          href={getLocalizedPath(link.path, lang)}
+          class="rounded-lg px-4 py-3 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+        >
+          {t(link.labelKey as any)}
+        </a>
+      ))}
+      <div class="my-2 border-t border-border" />
+      <p class="px-4 py-2 text-xs font-medium uppercase tracking-wider text-text-tertiary">{t('nav.categories')}</p>
+      {siteConfig.categories.map(cat => (
+        <a
+          href={getLocalizedPath(cat.path, lang)}
+          class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+        >
+          <span>{cat.icon}</span>
+          <span>{getLabel(cat)}</span>
+        </a>
+      ))}
+      <div class="my-2 border-t border-border" />
+      {user ? (
+        <a
+          href={getLocalizedPath('/dashboard', lang)}
+          class="rounded-lg px-4 py-3 text-sm font-medium text-accent transition-colors hover:bg-background-hover"
+        >
+          {t('nav.dashboard')}
+        </a>
+      ) : (
+        <>
+          <a
+            href={getLocalizedPath('/login', lang)}
+            class="rounded-lg px-4 py-3 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary"
+          >
+            {t('nav.login')}
+          </a>
+          <a
+            href={getLocalizedPath('/register', lang)}
+            class="mt-2 rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+          >
+            {t('nav.register')}
+          </a>
+        </>
+      )}
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    toggle?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+  });
+</script>

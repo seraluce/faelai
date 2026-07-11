@@ -1,0 +1,80 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NewsCard from '@/components/news/NewsCard.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('search.title')}>
+  <div class="mx-auto max-w-4xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('search.title')}</h1>
+      <p class="mt-2 text-text-secondary">搜索 AI 新闻、文章和话题</p>
+    </div>
+
+    {/* Search Input */}
+    <div class="mb-8">
+      <form id="search-form" class="relative">
+        <svg class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          id="search-input"
+          placeholder={t('search.placeholder')}
+          class="w-full rounded-xl border border-border bg-background py-4 pl-12 pr-4 text-text-primary placeholder-text-tertiary transition-colors focus:border-accent focus:outline-none"
+          autofocus
+        />
+      </form>
+    </div>
+
+    {/* Search Results */}
+    <div id="search-results">
+      <div class="py-12 text-center">
+        <p class="text-text-tertiary">输入关键词开始搜索</p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const results = document.getElementById('search-results')!;
+
+  let debounceTimer: ReturnType<typeof setTimeout>;
+
+  input?.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const query = input.value.trim();
+      if (!query) {
+        results.innerHTML = '<div class="py-12 text-center"><p class="text-text-tertiary">输入关键词开始搜索</p></div>';
+        return;
+      }
+      // Mock search results
+      results.innerHTML = `
+        <div class="space-y-4">
+          <p class="text-sm text-text-tertiary">找到 3 个结果</p>
+          <a href="/zh/news/openai-releases-gpt-5-with-reasoning-capabilities" class="block rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover">
+            <h3 class="font-semibold text-text-primary">OpenAI 发布 GPT-5，推理能力大幅提升</h3>
+            <p class="mt-2 text-sm text-text-secondary">OpenAI 今日正式发布了 GPT-5 模型，在数学推理、代码生成和多语言理解方面取得了显著突破。</p>
+            <div class="mt-3 flex items-center gap-4 text-xs text-text-tertiary">
+              <span>OpenAI Blog</span>
+              <span>5 分钟阅读</span>
+            </div>
+          </a>
+          <a href="/zh/news/anthropic-claude-4-safety-research" class="block rounded-xl border border-border bg-card p-6 transition-all hover:border-border-strong hover:bg-card-hover">
+            <h3 class="font-semibold text-text-primary">Anthropic 发布 Claude 4 安全研究报告</h3>
+            <p class="mt-2 text-sm text-text-secondary">Anthropic 发布了关于 Claude 4 安全性的深度研究报告。</p>
+            <div class="mt-3 flex items-center gap-4 text-xs text-text-tertiary">
+              <span>Anthropic</span>
+              <span>8 分钟阅读</span>
+            </div>
+          </a>
+        </div>
+      `;
+    }, 300);
+  });
+</script>

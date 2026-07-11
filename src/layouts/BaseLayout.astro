@@ -1,0 +1,88 @@
+---
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description = 'AI 新闻聚合与发布平台', image } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const siteTitle = `${title} | FaelAI`;
+---
+
+<!DOCTYPE html>
+<html lang={lang} class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <meta name="generator" content={Astro.generator} />
+  
+  {/* Open Graph */}
+  <meta property="og:title" content={siteTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  {image && <meta property="og:image" content={image} />}
+  
+  {/* Twitter */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={siteTitle} />
+  <meta name="twitter:description" content={description} />
+  {image && <meta name="twitter:image" content={image} />}
+  
+  <title>{siteTitle}</title>
+  
+  {/* RSS autodiscovery */}
+  <link rel="alternate" type="application/rss+xml" title="FaelAI RSS" href="/rss.xml" />
+  
+  {/* Geist fonts */}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <script is:inline>
+    // Theme initialization
+    const theme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('light', theme === 'light');
+  </script>
+</head>
+<body class="min-h-screen bg-background text-text-primary antialiased">
+  <Header />
+  <main>
+    <slot />
+  </main>
+  <Footer />
+  
+  {/* Theme toggle script */}
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtns = document.querySelectorAll('[data-theme-toggle]');
+      toggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.contains('dark');
+          const newTheme = isDark ? 'light' : 'dark';
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+          document.documentElement.classList.toggle('light', newTheme === 'light');
+          localStorage.setItem('theme', newTheme);
+          
+          // Update Giscus theme if present
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (iframe) {
+            iframe.contentWindow.postMessage(
+              { giscus: { setConfig: { theme: newTheme } } },
+              'https://giscus.app'
+            );
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

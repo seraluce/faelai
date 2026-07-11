@@ -1,0 +1,185 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const { slug } = Astro.params;
+
+const article = {
+  title: 'OpenAI Releases GPT-5 with Enhanced Reasoning Capabilities',
+  slug: 'openai-releases-gpt-5-with-reasoning-capabilities',
+  content: `
+    <p>OpenAI has officially released GPT-5, the company's most powerful language model to date. It achieves significant breakthroughs in mathematical reasoning, code generation, and multilingual understanding.</p>
+    
+    <h2>Key Improvements</h2>
+    <p>GPT-5 represents a qualitative leap over its predecessors in several critical areas:</p>
+    <ul>
+      <li><strong>Mathematical Reasoning</strong>: Achieves gold medal level on math competition benchmarks like IMO and AMC</li>
+      <li><strong>Code Generation</strong>: Can independently complete complex software engineering projects with code quality approaching senior engineers</li>
+      <li><strong>Multilingual Understanding</strong>: Supports 100+ languages with dramatically improved performance on non-English languages</li>
+    </ul>
+    
+    <h2>Safety Alignment</h2>
+    <p>OpenAI emphasizes that GPT-5 also makes important progress in safety alignment. Through improved RLHF (Reinforcement Learning from Human Feedback) techniques and new Constitutional AI methods, the model better follows human intent while maintaining strong capabilities.</p>
+    
+    <h2>Applications</h2>
+    <p>GPT-5 is already being applied in the following scenarios:</p>
+    <ul>
+      <li>Scientific Research: Helping researchers analyze data and design experiments</li>
+      <li>Software Development: Full-process assistance from requirements analysis to code implementation</li>
+      <li>Education: Personalized learning tutoring and knowledge解答</li>
+      <li>Creative Writing: Assisting in creating articles, stories, and scripts</li>
+    </ul>
+    
+    <blockquote>
+      <p>"GPT-5 represents an important step on our path to artificial general intelligence. It's not just more powerful — it's safer and more reliable." — Sam Altman, CEO of OpenAI</p>
+    </blockquote>
+    
+    <h2>Industry Impact</h2>
+    <p>The release of GPT-5 has garnered widespread attention in the tech industry. Multiple analyst firms believe this will accelerate AI adoption in enterprises while driving increased investment in AI safety across the industry.</p>
+  `,
+  excerpt: 'OpenAI has officially released GPT-5, achieving significant breakthroughs in mathematical reasoning, code generation, and multilingual understanding.',
+  coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
+  author: 'Ming Zhang',
+  sourceName: 'OpenAI Blog',
+  sourceUrl: 'https://openai.com/blog',
+  publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+  readingTime: 5,
+  viewCount: 3247,
+  likeCount: 186,
+  commentCount: 42,
+  category: { name: 'AI Companies', slug: 'ai-companies' },
+  tags: ['GPT-5', 'OpenAI', 'LLM', 'AI Reasoning'],
+};
+
+const relatedArticles = [
+  { title: 'Anthropic Publishes Claude 4 Safety Research Report', slug: 'anthropic-claude-4-safety-research', publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000) },
+  { title: 'Google DeepMind Achieves New Breakthrough in Protein Folding', slug: 'google-deepmind-protein-folding-breakthrough', publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000) },
+  { title: 'Meta Releases Llama 4 Open Source AI Model', slug: 'meta-llama-4-open-source-ai-model', publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000) },
+];
+---
+
+<BaseLayout title={article.title} description={article.excerpt} image={article.coverImage}>
+  <article class="mx-auto max-w-4xl px-4 py-8">
+    <nav class="mb-6 text-sm text-text-tertiary">
+      <a href={getLocalizedPath('/', lang)} class="hover:text-accent">Home</a>
+      <span class="mx-2">/</span>
+      <a href={getLocalizedPath('/news', lang)} class="hover:text-accent">News</a>
+      <span class="mx-2">/</span>
+      <span class="text-text-secondary">{article.category.name}</span>
+    </nav>
+
+    <header class="mb-8">
+      <div class="mb-4 flex flex-wrap gap-2">
+        <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+          {article.category.name}
+        </span>
+        {article.tags.slice(0, 3).map(tag => (
+          <a
+            href={getLocalizedPath('/tag/' + tag.toLowerCase().replace(/\s+/g, '-'), lang)}
+            class="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-accent hover:text-accent"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+
+      <h1 class="text-3xl font-bold text-text-primary md:text-4xl">
+        {article.title}
+      </h1>
+
+      <p class="mt-4 text-lg text-text-secondary">
+        {article.excerpt}
+      </p>
+
+      <div class="mt-6 flex flex-wrap items-center gap-4 border-b border-border pb-6">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
+            {article.author[0]}
+          </div>
+          <div>
+            <p class="text-sm font-medium text-text-primary">{article.author}</p>
+            <p class="text-xs text-text-tertiary">
+              {article.publishedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 text-sm text-text-tertiary">
+          <span>{article.readingTime} min read</span>
+          <span>{article.viewCount.toLocaleString()} views</span>
+          <span>{article.likeCount} likes</span>
+          <span>{article.commentCount} comments</span>
+        </div>
+      </div>
+    </header>
+
+    {article.coverImage && (
+      <div class="mb-8 overflow-hidden rounded-xl">
+        <img src={article.coverImage} alt={article.title} class="w-full object-cover" />
+      </div>
+    )}
+
+    <div class="prose mb-12" set:html={article.content} />
+
+    <div class="mb-12 flex items-center justify-between rounded-xl border border-border bg-card p-4">
+      <div class="flex items-center gap-4">
+        <button class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-accent">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          {t('news.likes')}
+        </button>
+        <button class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-accent">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+          </svg>
+          {t('news.bookmark')}
+        </button>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-background-hover hover:text-accent">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    {article.sourceUrl && (
+      <div class="mb-12 rounded-xl border border-border bg-card p-4">
+        <p class="text-sm text-text-secondary">
+          Source:
+          <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">
+            {article.sourceName} ↗
+          </a>
+        </p>
+      </div>
+    )}
+
+    <div class="mb-12">
+      <h2 class="mb-6 text-xl font-semibold text-text-primary">{t('news.related')}</h2>
+      <div class="grid gap-4 sm:grid-cols-3">
+        {relatedArticles.map(related => (
+          <a
+            href={getLocalizedPath('/news/' + related.slug, lang)}
+            class="group rounded-xl border border-border bg-card p-4 transition-all hover:border-border-strong hover:bg-card-hover"
+          >
+            <h3 class="text-sm font-medium text-text-primary transition-colors group-hover:text-accent">
+              {related.title}
+            </h3>
+            <p class="mt-2 text-xs text-text-tertiary">
+              {related.publishedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </p>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-border bg-card p-6">
+      <h2 class="mb-4 text-xl font-semibold text-text-primary">{t('news.comments')}</h2>
+      <p class="text-sm text-text-secondary">Comments coming soon.</p>
+    </div>
+  </article>
+</BaseLayout>

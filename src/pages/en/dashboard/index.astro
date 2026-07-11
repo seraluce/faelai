@@ -1,0 +1,93 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(getLocalizedPath('/login', lang));
+}
+---
+
+<BaseLayout title={t('dashboard.title')}>
+  <div class="mx-auto max-w-5xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-text-primary">{t('dashboard.title')}</h1>
+      <p class="mt-1 text-text-secondary">Manage your account and content</p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="col-span-full rounded-xl border border-border bg-card p-6 sm:col-span-2 lg:col-span-1">
+        <div class="flex items-center gap-4">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-bold text-accent">
+            {(user.fullName || user.username)[0].toUpperCase()}
+          </div>
+          <div>
+            <h2 class="font-semibold text-text-primary">{user.fullName || user.username}</h2>
+            <p class="text-sm text-text-secondary">@{user.username}</p>
+            <p class="text-xs text-text-tertiary">{user.email}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-border bg-card p-6">
+        <h3 class="mb-4 font-semibold text-text-primary">My Stats</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-sm text-text-secondary">Published</span>
+            <span class="text-sm font-medium text-text-primary">3</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-text-secondary">Drafts</span>
+            <span class="text-sm font-medium text-text-primary">2</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-text-secondary">Bookmarks</span>
+            <span class="text-sm font-medium text-text-primary">12</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-border bg-card p-6">
+        <h3 class="mb-4 font-semibold text-text-primary">Quick Actions</h3>
+        <div class="space-y-2">
+          <a href={getLocalizedPath('/dashboard/articles', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            📄 My Articles
+          </a>
+          <a href={getLocalizedPath('/dashboard/bookmarks', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            ⭐ Bookmarks
+          </a>
+          <a href={getLocalizedPath('/dashboard/profile', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            👤 Profile
+          </a>
+          <a href={getLocalizedPath('/dashboard/settings', lang)} class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-hover hover:text-text-primary">
+            ⚙️ Settings
+          </a>
+        </div>
+      </div>
+
+      <div class="col-span-full rounded-xl border border-border bg-card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-text-primary">Recent Bookmarks</h3>
+          <a href={getLocalizedPath('/dashboard/bookmarks', lang)} class="text-sm text-accent hover:underline">View All</a>
+        </div>
+        <div class="space-y-3">
+          <a href={getLocalizedPath('/news/ai-agent-automation-workflow', lang)} class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover">
+            <span class="text-sm text-text-primary">AI Agent Automation Workflow Guide</span>
+            <span class="text-xs text-text-tertiary">2 days ago</span>
+          </a>
+          <a href={getLocalizedPath('/news/rag-best-practices', lang)} class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover">
+            <span class="text-sm text-text-primary">RAG Technology Best Practices</span>
+            <span class="text-xs text-text-tertiary">3 days ago</span>
+          </a>
+          <a href={getLocalizedPath('/news/llm-fine-tuning-tutorial', lang)} class="flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-background-hover">
+            <span class="text-sm text-text-primary">LLM Fine-Tuning Tutorial</span>
+            <span class="text-xs text-text-tertiary">5 days ago</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

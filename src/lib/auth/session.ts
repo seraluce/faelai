@@ -1,3 +1,5 @@
+// src/lib/auth/session.ts
+// 功能：Session 管理 — 创建、验证、失效 Session，Cookie 读写，Token 的 SHA-256 哈希，自动续期
 import { db, schema } from '@/lib/db';
 import { eq, and, gt } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';

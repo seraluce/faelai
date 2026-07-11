@@ -1,3 +1,6 @@
+// src/env.d.ts
+// 功能：类型声明 — 环境变量接口、App.Locals（user/session）类型扩展
+
 /// <reference types="astro/client" />
 
 interface Env {

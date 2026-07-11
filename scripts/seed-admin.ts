@@ -1,5 +1,6 @@
 /**
- * 管理员账号种子脚本
+ * scripts/seed-admin.ts
+ * 功能：管理员账号种子脚本 — 创建默认管理员（admin@faelai.com / Admin@123456）
  * 运行方式: npx tsx scripts/seed-admin.ts
  */
 import { drizzle } from 'drizzle-orm/libsql';

@@ -63,6 +63,35 @@ FaelAI 是一个模块化的 AI 新闻聚合与发布网站，基于 Astro 7、R
 - 按需渲染的 API 路由使用 `export const prerender = false`
 - 交互式 React 使用 `client:load`
 - 禁止使用 emoji，全部使用 lucide-react 图标
+- **每个源文件最顶端必须添加注释**，标注文件路径和实现的功能（见下方格式）
+
+### 文件头注释格式
+
+每个 `.astro`、`.ts`、`.tsx`、`.css` 源文件的最顶端必须包含注释：
+
+```astro
+---
+// src/pages/index.astro
+// 功能：首页 — 展示精选文章、最新资讯、热门排行、热门话题、分类导航
+---
+```
+
+```typescript
+// src/lib/auth/session.ts
+// 功能：Session 管理 — 创建、验证、失效 Session，Cookie 读写
+```
+
+```css
+/* src/styles/global.css */
+/* 功能：全局样式 — Tailwind v4 主题配置、表单验证、排版、动画 */
+```
+
+注释规则：
+- 路径为相对于项目根目录的完整路径
+- 功能描述简洁明了，说明该文件的核心职责
+- `.astro` 文件使用 `---` 包裹的 frontmatter 注释
+- `.ts`/`.tsx` 文件使用 `//` 单行注释
+- `.css` 文件使用 `/* */` 块注释
 
 ## 数据库
 

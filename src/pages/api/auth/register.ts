@@ -1,3 +1,5 @@
+// src/pages/api/auth/register.ts
+// 功能：注册 API — POST 校验验证码、创建用户账号、密码哈希、自动登录
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
 import { hashPassword } from '@/lib/auth';

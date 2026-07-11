@@ -1,3 +1,5 @@
+// src/lib/db/index.ts
+// 功能：数据库客户端初始化 — Turso/libSQL 连接 + Drizzle ORM 实例
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 import * as schema from './schema';

@@ -1,3 +1,5 @@
+// src/lib/auth/email.ts
+// 功能：邮箱验证码 — SMTP 发送、6位验证码生成、内存存储、10分钟过期、开发模式直接返回
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({

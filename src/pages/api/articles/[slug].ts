@@ -1,3 +1,5 @@
+// src/pages/api/articles/[slug].ts
+// 功能：文章详情 API — GET 获取文章（浏览量+1）、PUT 更新、DELETE 删除
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
 import { eq } from 'drizzle-orm';

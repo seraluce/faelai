@@ -1,3 +1,6 @@
+// src/i18n/utils.ts
+// 功能：i18n 工具函数 — 语言提取、翻译函数、本地化路径生成、多语言路径切换
+
 import { ui, defaultLang, type UIKeys } from './ui';
 
 export function getLangFromUrl(url: URL): string {

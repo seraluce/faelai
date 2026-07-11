@@ -1,3 +1,6 @@
+// src/i18n/ui.ts
+// 功能：国际化翻译文案 — 中英文 67 个 key（导航、首页、认证、后台、通用、搜索、页脚）
+
 export const languages = {
   zh: '中文',
   en: 'English',

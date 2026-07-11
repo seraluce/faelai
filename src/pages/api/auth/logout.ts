@@ -1,3 +1,5 @@
+// src/pages/api/auth/logout.ts
+// 功能：登出 API — POST 销毁 Session，清除 Cookie
 import type { APIRoute } from 'astro';
 import { getSessionTokenFromRequest, invalidateSession, hashSessionToken, deleteSessionCookie } from '@/lib/auth';
 

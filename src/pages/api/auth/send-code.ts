@@ -1,3 +1,5 @@
+// src/pages/api/auth/send-code.ts
+// 功能：发送验证码 API — POST 生成6位验证码、SMTP发送邮件、10分钟过期
 import type { APIRoute } from 'astro';
 import { sendVerificationEmail } from '@/lib/auth/email';
 

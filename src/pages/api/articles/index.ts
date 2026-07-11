@@ -1,3 +1,5 @@
+// src/pages/api/articles/index.ts
+// 功能：文章列表 API — GET 分页、分类、标签、状态、语言、搜索筛选；POST 创建文章
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
 import { eq, desc, and, sql } from 'drizzle-orm';

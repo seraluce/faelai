@@ -1,3 +1,5 @@
+// src/lib/auth/password.ts
+// 功能：密码哈希 — Argon2 哈希与验证（memoryCost: 19456, timeCost: 2, parallelism: 1）
 import { hash, verify } from '@node-rs/argon2';
 
 const ARGON_OPTIONS = {

@@ -1,3 +1,5 @@
+// src/pages/api/auth/login.ts
+// 功能：登录 API — POST 邮箱+密码登录，验证凭据，创建 Session，返回用户信息
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
 import { verifyPassword } from '@/lib/auth';

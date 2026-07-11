@@ -1,3 +1,5 @@
+// src/lib/utils/index.ts
+// 功能：工具函数 — cn（类名合并）、formatDate、formatRelativeTime、generateSlug、generateId、calculateReadingTime、truncate
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

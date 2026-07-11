@@ -1,10 +1,13 @@
+// src/config/site.ts
+// 功能：站点集中配置 — 导航、分类（SVG图标名）、话题、页脚链接、社交、协议、版权
+
 export const siteConfig = {
   name: 'FaelAI',
   title: 'AI 新闻聚合',
   titleEn: 'AI News Aggregator',
   description: '实时追踪人工智能领域最新动态',
   descriptionEn: 'Track the latest developments in artificial intelligence',
-  url: 'https://faelai.com',
+  url: import.meta.env.PUBLIC_SITE_URL || 'https://faelai.com',
   locale: {
     default: 'zh',
     supported: ['zh', 'en'],
@@ -18,14 +21,14 @@ export const siteConfig = {
     { path: '/about', labelKey: 'nav.about' },
   ],
 
-  // 分类
+  // 分类（icon 为 lucide 图标名）
   categories: [
-    { path: '/category/ai-companies', zh: 'AI 公司', en: 'AI Companies', icon: '🏢', color: '#0070f3' },
-    { path: '/category/research', zh: '学术研究', en: 'Research', icon: '📚', color: '#7928ca' },
-    { path: '/category/ai-products', zh: 'AI 产品', en: 'AI Products', icon: '🚀', color: '#ff0080' },
-    { path: '/category/industry', zh: '行业动态', en: 'Industry', icon: '📊', color: '#f5a623' },
-    { path: '/category/open-source', zh: '开源项目', en: 'Open Source', icon: '💻', color: '#50e3c2' },
-    { path: '/category/ai-ethics', zh: 'AI 伦理', en: 'AI Ethics', icon: '⚖️', color: '#ee0000' },
+    { path: '/category/ai-companies', zh: 'AI 公司', en: 'AI Companies', icon: 'building-2', color: '#0070f3' },
+    { path: '/category/research', zh: '学术研究', en: 'Research', icon: 'book-open', color: '#7928ca' },
+    { path: '/category/ai-products', zh: 'AI 产品', en: 'AI Products', icon: 'rocket', color: '#ff0080' },
+    { path: '/category/industry', zh: '行业动态', en: 'Industry', icon: 'bar-chart-3', color: '#f5a623' },
+    { path: '/category/open-source', zh: '开源项目', en: 'Open Source', icon: 'code-2', color: '#50e3c2' },
+    { path: '/category/ai-ethics', zh: 'AI 伦理', en: 'AI Ethics', icon: 'scale', color: '#ee0000' },
   ],
 
   // 热门话题标签

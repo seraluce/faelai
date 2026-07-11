@@ -1,3 +1,6 @@
+/* src/styles/global.css */
+/* 功能：全局样式 — Tailwind v4 主题配置（深浅模式）、表单验证红色边框、排版、滚动条、动画 */
+
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -144,6 +147,28 @@ body {
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Form validation: required field invalid → red border */
+input:invalid:not(:placeholder-shown),
+textarea:invalid:not(:placeholder-shown),
+select:invalid:not(:placeholder-shown) {
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 0 1px var(--color-error);
+}
+
+input:valid:not(:placeholder-shown) {
+  border-color: var(--color-border);
+  box-shadow: none;
+}
+
+/* Focus states override validation */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 1px var(--color-accent) !important;
+  outline: none;
 }
 
 /* Prose styles for article content */

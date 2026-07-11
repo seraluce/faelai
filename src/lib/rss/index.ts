@@ -1,3 +1,5 @@
+// src/lib/rss/index.ts
+// 功能：RSS 抓取与解析 — fetchRSSFeed（rss-parser）、HTML 内容提取、阅读时间估算
 import Parser from 'rss-parser';
 
 const parser = new Parser({

@@ -1,3 +1,5 @@
+// src/lib/db/schema.ts
+// 功能：数据库表结构 — 12 张表定义（用户、密码、Session、OAuth、文章、分类、标签、RSS源、热门评分、收藏、点赞）
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
 // ============================================================

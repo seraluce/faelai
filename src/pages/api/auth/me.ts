@@ -1,3 +1,5 @@
+// src/pages/api/auth/me.ts
+// 功能：当前用户信息 API — GET 返回 Session 对应的用户信息
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ locals }) => {

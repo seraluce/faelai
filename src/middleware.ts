@@ -1,3 +1,6 @@
+// src/middleware.ts
+// 功能：Astro 中间件 — Session 验证、用户信息挂载、路由保护（admin/editor 角色校验、登录校验）
+
 import { defineMiddleware } from 'astro:middleware';
 import { validateSession, getSessionTokenFromRequest } from '@/lib/auth';
 

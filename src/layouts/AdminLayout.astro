@@ -210,8 +210,14 @@ const user = Astro.locals.user;
 
   {/* Main Content Area */}
   <div class="flex-1 md:ml-60">
-    <div class="pt-14 md:pt-0">
-      <slot />
+    <div class="flex min-h-screen flex-col pt-14 md:pt-0">
+      <div class="flex-1">
+        <slot />
+      </div>
+      {/* 管理后台简版页脚 */}
+      <footer class="border-t border-border px-4 py-3 text-center text-xs text-text-tertiary">
+        FaelAI Admin &copy; {new Date().getFullYear()}
+      </footer>
     </div>
   </div>
 </div>

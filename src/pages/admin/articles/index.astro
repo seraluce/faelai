@@ -226,10 +226,8 @@ if (!user) {
   getEl('btn-delete-selected').addEventListener('click', async () => {
     if (!confirm(`确定删除 ${selectedIds.size} 篇文章？`)) return;
     for (const id of selectedIds) {
-      await fetch('/api/articles/slug', {
+      await fetch(`/api/articles/by-id/${id}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
       });
     }
     selectedIds.clear();

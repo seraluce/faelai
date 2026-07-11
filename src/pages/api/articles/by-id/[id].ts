@@ -28,10 +28,18 @@ export const GET: APIRoute = async ({ params }) => {
       });
     }
 
-    return new Response(JSON.stringify({ article: articles[0] }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const articleTags = await db
+      .select({ tagId: schema.articleTags.tagId })
+      .from(schema.articleTags)
+      .where(eq(schema.articleTags.articleId, id));
+
+    return new Response(
+      JSON.stringify({ article: { ...articles[0], tagIds: articleTags.map((t) => t.tagId) } }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     console.error('Article detail by id error:', error);
     return new Response(JSON.stringify({ error: '获取文章失败' }), {
@@ -88,6 +96,15 @@ export const PUT: APIRoute = async ({ request, locals, params }) => {
     updateData.updatedAt = new Date();
 
     await db.update(schema.articles).set(updateData).where(eq(schema.articles.id, id));
+
+    if (body.tagIds !== undefined) {
+      await db.delete(schema.articleTags).where(eq(schema.articleTags.articleId, id));
+      if (body.tagIds.length > 0) {
+        await db
+          .insert(schema.articleTags)
+          .values(body.tagIds.map((tagId: string) => ({ articleId: id, tagId })));
+      }
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

@@ -1,0 +1,38 @@
+[2m00:30:05[22m [34m[@astrojs/node][39m Enabling sessions with filesystem storage
+[2m00:30:06[22m [34m[vite][39m connected.
+[2m00:30:06[22m [34m[types][39m Generated [2m14ms[22m
+[2m00:30:06[22m [34m[vite][39m connected.
+[42m[1m astro [22m[49m [32mv7.0.7[39m [2mready in[22m 1738 [2mms[22m
+[2m┃[22m Local    [36mhttp://localhost:8081/[39m
+[2m┃[22m Network  [36mhttp://10.0.5.53:8081/[39m
+           [36mhttp://10.53.5.53:8081/[39m
+[2m00:30:06[22m [32mwatching for file changes...[39m
+[2m00:30:17[22m [34m[200][39m / [2m578ms[22m
+[2m00:34:21[22m [34m[200][39m / [2m2ms[22m
+[2m00:52:37[22m [34m[200][39m / [2m4ms[22m
+[2m00:52:38[22m [34m[200][39m / [2m4ms[22m
+[2m00:52:45[22m [33m[404][39m /register [2m11ms[22m
+[2m00:59:05[22m [34m[vite][39m program reload
+[2m00:59:06[22m [33m[404][39m /register [2m25ms[22m
+[2m00:59:07[22m [34m[vite][39m program reload
+[2m00:59:08[22m [33m[404][39m /register [2m19ms[22m
+[2m00:59:08[22m [34m[vite][39m program reload
+[2m00:59:09[22m [33m[404][39m /register [2m28ms[22m
+[2m00:59:09[22m [34m[vite][39m program reload
+[2m00:59:10[22m [33m[404][39m /register [2m19ms[22m
+[2m00:59:12[22m [34m[vite][39m program reload
+[2m00:59:12[22m [34m[vite][39m program reload
+[2m00:59:12[22m [33m[404][39m /register [2m19ms[22m
+[2m00:59:12[22m [34m[vite][39m program reload
+[2m00:59:13[22m [33m[404][39m /register [2m19ms[22m
+[2m00:59:15[22m [34m[vite][39m program reload
+[2m00:59:16[22m [33m[404][39m /register [2m18ms[22m
+[2m00:59:17[22m [34m[vite][39m program reload
+[2m00:59:18[22m [33m[404][39m /register [2m19ms[22m
+[2m00:59:19[22m [34m[vite][39m program reload
+[2m00:59:20[22m [33m[404][39m /register [2m20ms[22m
+[2m00:59:20[22m [34m[vite][39m program reload
+[2m00:59:21[22m [33m[404][39m /register [2m18ms[22m
+[2m00:59:22[22m [34m[vite][39m program reload
+[2m00:59:22[22m [33m[404][39m /register [2m20ms[22m
+[2m00:59:26[22m [34m[200][39m / [2m11ms[22m

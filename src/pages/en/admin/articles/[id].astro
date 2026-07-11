@@ -193,7 +193,7 @@ const isNew = id === 'new';
   async function loadArticle() {
     if (isNew || !articleId) return;
     try {
-      const res = await fetch(`/api/articles/${articleId}`);
+      const res = await fetch(`/api/articles/by-id/${articleId}`);
       const data = await res.json();
       const a = data.article;
       document.getElementById('title').value = a.title || '';
@@ -228,14 +228,14 @@ const isNew = id === 'new';
     try {
       let res;
       if (isNew) {
-        res = await fetch('/api/articles/slug', {
+        res = await fetch('/api/articles/new', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
       } else {
         body.id = articleId;
-        res = await fetch('/api/articles/slug', {
+        res = await fetch(`/api/articles/by-id/${articleId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -262,10 +262,8 @@ const isNew = id === 'new';
   document.getElementById('btn-delete')?.addEventListener('click', async () => {
     if (!confirm('Delete this article?')) return;
     try {
-      const res = await fetch('/api/articles/slug', {
+      const res = await fetch(`/api/articles/by-id/${articleId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: articleId }),
       });
       const data = await res.json();
       if (data.success) window.location.href = '/admin/articles';

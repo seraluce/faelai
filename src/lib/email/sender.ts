@@ -1,8 +1,9 @@
 // src/lib/email/sender.ts
-// 功能：邮件发送服务 — Resend API 优先、SMTP 降级、验证码存储
+// 功能：邮件发送服务 — Resend API 优先、SMTP 降级、验证码存储、验证令牌数据库持久化
 
 import nodemailer from 'nodemailer';
 import { verificationTemplate, welcomeTemplate, passwordResetTemplate } from './templates';
+import { db, schema } from '@/lib/db';
 
 // ---------------------------------------------------------------------------
 // 传输配置
@@ -98,20 +99,36 @@ export async function sendEmail(
 // ---------------------------------------------------------------------------
 
 export async function sendVerificationEmail(
-  email: string
-): Promise<{ success: boolean; error?: string; devCode?: string }> {
+  email: string,
+  userId?: string
+): Promise<{ success: boolean; error?: string; devCode?: string; verificationToken?: string }> {
   const code = generateVerificationCode();
   codeStore.set(email, { code, expiresAt: Date.now() + CODE_EXPIRY_MS });
+
+  let verificationToken: string | undefined;
+
+  if (userId) {
+    verificationToken = crypto.randomUUID();
+    const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await db.insert(schema.emailVerifications).values({
+      token: verificationToken,
+      userId,
+      expiresAt: tokenExpiresAt,
+    });
+  }
 
   // 开发模式：返回验证码到调用方
   if (!RESEND_API_KEY && !import.meta.env.SMTP_USER) {
     console.log(`[DEV] Verification code for ${email}: ${code}`);
-    return { success: true, devCode: code };
+    if (verificationToken) {
+      console.log(`[DEV] Verification token for ${email}: ${verificationToken}`);
+    }
+    return { success: true, devCode: code, verificationToken };
   }
 
   const result = await sendEmail(email, 'FaelAI - 邮箱验证码', verificationTemplate(code));
 
-  return result;
+  return { ...result, verificationToken };
 }
 
 export async function sendWelcomeEmail(

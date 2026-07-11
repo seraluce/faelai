@@ -7,15 +7,16 @@ import { checkEmailRateLimit, recordEmailSend } from '@/lib/email/rate-limit';
 export { verify as verifyCode };
 
 export async function sendVerificationEmail(
-  email: string
-): Promise<{ success: boolean; error?: string; devCode?: string }> {
+  email: string,
+  userId?: string
+): Promise<{ success: boolean; error?: string; devCode?: string; verificationToken?: string }> {
   const rateCheck = checkEmailRateLimit(email);
   if (!rateCheck.allowed) {
     const minutes = Math.ceil((rateCheck.retryAfter || 0) / 60);
     return { success: false, error: `发送过于频繁，请 ${minutes} 分钟后重试` };
   }
 
-  const result = await sendEmail(email);
+  const result = await sendEmail(email, userId);
 
   if (result.success) {
     recordEmailSend(email);

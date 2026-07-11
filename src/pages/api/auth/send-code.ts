@@ -28,7 +28,6 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: true,
         message: '验证码已发送到你的邮箱',
-        devCode: result.devCode,
       }),
       {
         status: 200,

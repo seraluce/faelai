@@ -15,6 +15,13 @@
       "when": 1783795152813,
       "tag": "0001_minor_the_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783801819905,
+      "tag": "0002_sweet_maximus",
+      "breakpoints": true
     }
   ]
 }

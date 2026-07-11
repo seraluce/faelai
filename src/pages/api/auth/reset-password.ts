@@ -1,10 +1,9 @@
 // src/pages/api/auth/reset-password.ts
-// 功能：密码重置请求 API — POST 生成重置令牌、发送重置邮件、开发模式返回令牌
+// 功能：密码重置请求 API — POST 生成重置令牌、数据库存储、发送重置邮件
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import nodemailer from 'nodemailer';
-import { storeResetToken } from './confirm-reset';
 
 const transporter = nodemailer.createTransport({
   host: import.meta.env.SMTP_HOST || 'smtp.gmail.com',
@@ -43,7 +42,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     const token = crypto.randomUUID();
     const expiresAt = Date.now() + 60 * 60 * 1000;
-    storeResetToken(token, users[0].id, expiresAt);
+
+    await db.insert(schema.passwordResets).values({
+      token,
+      userId: users[0].id,
+      expiresAt: new Date(expiresAt),
+    });
 
     if (!import.meta.env.SMTP_USER) {
       console.log(`[DEV] Password reset token for ${email}: ${token}`);
@@ -51,7 +55,6 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: true,
           message: '如果该邮箱已注册，你将收到重置邮件',
-          devToken: token,
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );

@@ -2,6 +2,7 @@
 // src/pages/admin/articles/[id].astro
 // 功能：文章编辑页面 — 创建/编辑文章、标题、内容、分类、标签、封面图上传、状态管理
 import AdminLayout from '@/layouts/AdminLayout.astro';
+import TiptapEditor from '@/components/editor/TiptapEditor';
 
 const user = Astro.locals.user;
 
@@ -51,13 +52,15 @@ const isNew = id === 'new';
 
         <div class="rounded-xl border border-border bg-card p-6">
           <label for="content" class="mb-2 block text-sm font-medium text-text-primary">内容</label>
-          <textarea
-            id="content"
-            name="content"
-            rows="20"
-            placeholder="输入文章内容（支持 HTML）..."
-            class="w-full rounded-lg border border-border bg-background px-4 py-2.5 font-mono text-sm text-text-primary placeholder-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-          ></textarea>
+          <input type="hidden" id="content" name="content" value="" />
+          <TiptapEditor
+            client:load
+            content=""
+            placeholder="开始撰写文章内容..."
+            onChange={(html) => {
+              (document.getElementById('content') as HTMLInputElement).value = html;
+            }}
+          />
         </div>
 
         <div class="rounded-xl border border-border bg-card p-6">
@@ -259,6 +262,9 @@ const isNew = id === 'new';
       const a = data.article;
       document.getElementById('title').value = a.title || '';
       document.getElementById('content').value = a.content || '';
+      window.dispatchEvent(
+        new CustomEvent('tiptap-set-content', { detail: { html: a.content || '' } })
+      );
       document.getElementById('excerpt').value = a.excerpt || '';
       document.getElementById('status').value = a.status || 'draft';
       document.getElementById('lang').value = a.lang || 'zh';

@@ -1,5 +1,5 @@
 // src/lib/db/schema.ts
-// 功能：数据库表结构 — 13 张表定义（用户、密码、Session、OAuth、文章、分类、标签、RSS源、热门评分、收藏、点赞、站点设置）
+// 功能：数据库表结构 — 15 张表定义（用户、密码、Session、OAuth、文章、分类、标签、RSS源、热门评分、收藏、点赞、站点设置、密码重置、邮箱验证）
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
 // ============================================================
@@ -171,6 +171,28 @@ export const siteSettings = sqliteTable('site_settings', {
   key: text('key').primaryKey(),
   value: text('value'),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+});
+
+// ============================================================
+// Password Reset & Email Verification
+// ============================================================
+
+export const passwordResets = sqliteTable('password_resets', {
+  token: text('token').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+});
+
+export const emailVerifications = sqliteTable('email_verifications', {
+  token: text('token').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
 // ============================================================

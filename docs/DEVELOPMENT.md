@@ -458,21 +458,166 @@ npx tsx scripts/seed-admin.ts
 
 ---
 
-## 十二、站点配置
+## 十二、配置文件体系
+
+所有链接、关键值、常量集中管理在 `src/config/` 目录下，按相关性分类：
+
+```
+src/config/
+├── site.ts      # 站点信息、导航、分类、话题、社交、协议、版权
+├── auth.ts      # 认证配置（Session、密码、验证码、角色、路由保护）
+├── email.ts     # 邮件配置（SMTP、发件人、模板颜色）
+├── rss.ts       # RSS 配置（抓取超时、User-Agent、阅读速度、缓存）
+└── api.ts       # API 配置（分页、文章默认值、时间格式阈值）
+```
+
+### site.ts — 站点配置
+
+| 配置项 | 说明 |
+|--------|------|
+| `name` | 站点名称 |
+| `title` / `titleEn` | 中/英文标题 |
+| `description` / `descriptionEn` | 中/英文描述 |
+| `url` | 站点 URL（从 `PUBLIC_SITE_URL` 环境变量读取） |
+| `locale.default` | 默认语言 |
+| `nav` | 导航链接 |
+| `categories` | 分类（含 SVG 图标名、颜色） |
+| `topics` | 热门话题标签 |
+| `footerProduct` / `footerCategories` / `footerTopics` | 底部链接 |
+| `social` | 社交链接 |
+| `protocols` | 协议页面 |
+| `email` | 联系邮箱 |
+| `copyright` | 版权信息 |
+
+### auth.ts — 认证配置
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `session.maxAge` | 30 天 | Session 有效期 |
+| `session.renewThreshold` | 15 天 | 续期阈值 |
+| `session.cookieName` | `'session'` | Cookie 名称 |
+| `session.tokenLength` | 20 | Token 随机字节数 |
+| `password.memoryCost` | 19456 | Argon2 内存消耗 |
+| `password.timeCost` | 2 | Argon2 迭代次数 |
+| `password.minLength` | 8 | 最小密码长度 |
+| `verification.codeLength` | 6 | 验证码位数 |
+| `verification.expiryMs` | 10 分钟 | 验证码有效期 |
+| `verification.cooldownSeconds` | 60 | 重发倒计时 |
+| `roles` | admin/editor/user | 角色常量 |
+| `protectedRoutes` | /admin, /dashboard | 受保护路由 |
+| `publicApiPaths` | /api/auth/* | 公开 API |
+| `staticPrefixes` | /_astro, /favicon | 静态资源前缀 |
+
+### email.ts — 邮件配置
+
+| 配置项 | 来源 | 说明 |
+|--------|------|------|
+| `smtp.host` | `SMTP_HOST` 环境变量 | SMTP 服务器 |
+| `smtp.port` | `SMTP_PORT` 环境变量 | SMTP 端口 |
+| `smtp.secure` | `SMTP_SECURE` 环境变量 | 是否 TLS |
+| `from.name` | 站点名称 | 发件人名称 |
+| `from.address` | `SMTP_USER` 环境变量 | 发件人邮箱 |
+| `subjects` | 自动生成 | 邮件主题模板 |
+| `templateColors` | 固定值 | 邮件模板颜色 |
+
+### rss.ts — RSS 配置
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `fetchTimeout` | 10000ms | 抓取超时 |
+| `userAgent` | `'FaelAI/1.0'` | 请求 UA |
+| `wordsPerMinute` | 200 | 阅读速度 |
+| `defaultFetchInterval` | 3600s | 默认抓取间隔 |
+| `cacheMaxAge` | 3600s | RSS 缓存时间 |
+| `sitemapCacheMaxAge` | 3600s | Sitemap 缓存时间 |
+
+### api.ts — API 配置
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `pagination.defaultPage` | 1 | 默认页码 |
+| `pagination.defaultLimit` | 20 | 默认每页条数 |
+| `pagination.maxLimit` | 100 | 最大每页条数 |
+| `articles.defaultStatus` | `'published'` | 默认文章状态 |
+| `articles.defaultLang` | `'zh'` | 默认语言 |
+| `time.minute/hour/day` | 60s/3600s/86400s | 时间格式化常量 |
+| `time.relativeDays` | 30 | 相对时间阈值 |
+| `cache.xmlMaxAge` | 3600s | XML 缓存时间 |
+
+---
+
+## 十三、OG 图片自动生成
+
+OG 图片通过 `/api/og.svg` 端点动态生成，无需手动制作图片。
+
+**使用方式：**
+
+```astro
+<!-- 自动生成（默认使用页面 title + description） -->
+<BaseLayout title="文章标题" description="文章描述" />
+
+<!-- 自定义颜色（如分类色） -->
+<BaseLayout title="文章标题" description="文章描述" ogColor="#0070f3" />
+
+<!-- 使用自定义图片（覆盖自动生成） -->
+<BaseLayout title="文章标题" image="https://example.com/custom.png" />
+```
+
+**API 参数：**
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `title` | 标题 | 站点标题 |
+| `subtitle` | 副标题 | 站点描述 |
+| `lang` | 语言 | `zh` |
+| `color` | 强调色 | `#0070f3` |
+
+---
+
+## 十四、文件头注释规范
+
+每个源文件最顶端必须包含注释，格式如下：
+
+```astro
+---
+// src/pages/index.astro
+// 功能：首页 — 新闻滚动条、精选文章、最新资讯、热门排行、热门话题、分类导航
+---
+```
+
+```typescript
+// src/lib/auth/session.ts
+// 功能：Session 管理 — 创建、验证、失效 Session，Cookie 读写
+```
+
+```css
+/* src/styles/global.css */
+/* 功能：全局样式 — Tailwind v4 主题配置、表单验证、排版、动画 */
+```
+
+- 路径为相对于项目根目录的完整路径
+- 功能描述简洁明了，说明核心职责
+- `.astro` 文件使用 `---` 包裹的 frontmatter 注释
+- `.ts`/`.tsx` 文件使用 `//` 单行注释
+- `.css` 文件使用 `/* */` 块注释
+
+---
+
+## 十五、站点配置（旧版，已迁移到第十二节）
 
 集中管理在 `src/config/site.ts`，包含：
 
 - **站点信息**：名称、标题（中/英）、描述、URL
 - **导航链接**：新闻、趋势、热门、关于
-- **分类**：大模型、AI 应用、机器人、芯片、前沿研究、行业动态
-- **话题标签**：GPT、Claude、Gemini、Llama、Copilot、Sora
+- **分类**：AI 公司、学术研究、AI 产品、行业动态、开源项目、AI 伦理
+- **话题标签**：大语言模型、计算机视觉、机器人、AGI、AI 工具、多模态
 - **底部链接**：产品、分类、话题
 - **社交链接**：GitHub、Twitter/X
 - **协议页面**：隐私政策、服务条款、免责声明
 
 ---
 
-## 十三、部署
+## 十六、部署
 
 ### 环境要求
 
